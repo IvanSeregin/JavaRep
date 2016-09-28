@@ -1,0 +1,9 @@
+package main;
+
+public class HelloWorld {
+    @Override
+    public void start(Stage primaryStage) 
+    {
+
+    }
+}

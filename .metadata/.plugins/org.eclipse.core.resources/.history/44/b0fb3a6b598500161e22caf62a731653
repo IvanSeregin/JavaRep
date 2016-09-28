@@ -1,0 +1,20 @@
+package view;
+
+import javafx.fxml.FXML;
+import main.HelloWorld;
+
+public class RootLayoutController 
+{
+	private HelloWorld mainApp;
+	
+	public void setMainApp(HelloWorld mainApp)
+	{
+		this.mainApp = mainApp;
+	}
+	
+	@FXML
+	private void handlePrintText()
+	{
+		
+	}
+}

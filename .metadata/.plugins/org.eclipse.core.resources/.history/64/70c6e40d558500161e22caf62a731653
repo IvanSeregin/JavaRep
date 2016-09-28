@@ -1,0 +1,11 @@
+package model;
+
+public class TextToPrint 
+{
+	String text;
+	
+	public void TextToPrint()
+	{
+		text = new String("This is text");
+	}
+}
