@@ -1,0 +1,23 @@
+package application.model;
+
+public class CalculatorModel 
+{
+	double operand1;
+	double operand2;
+	
+	public CalculatorModel()
+	{
+		operand1 = 0.0;
+		operand2 = 0.0;
+	}
+	
+	public double getOperand1()
+	{
+		return operand1;
+	}
+	
+	public double getOperand2()
+	{
+		return operand2;
+	}	
+}

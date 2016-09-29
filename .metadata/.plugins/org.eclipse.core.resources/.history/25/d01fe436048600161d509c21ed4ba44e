@@ -1,0 +1,49 @@
+package application.view;
+
+public enum OperButtonAction 
+{
+	plus 
+	{
+	    @Override
+	    public String getOperation() 
+	    {
+	        return "+";
+	    }; 
+	},
+	minus 
+	{
+	    @Override
+	    public String getOperation() 
+	    {
+	        return 8;
+	    }; 
+	},
+	div 
+	{
+	    @Override
+	    public String getOperation()  
+	    {
+	        return 8;
+	    }; 
+	},
+	mult 
+	{
+	    @Override
+	    public String getOperation()  
+	    {
+	        return 9;
+	    }; 
+	},
+	compute 
+	{
+	    @Override
+	    public String getOperation()  
+	    {
+	        return 0;
+	    }; 
+	}, 
+   public abstract String getOperation();
+}
+
+
+ 

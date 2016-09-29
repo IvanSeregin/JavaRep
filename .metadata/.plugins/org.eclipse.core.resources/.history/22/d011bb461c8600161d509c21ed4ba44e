@@ -1,0 +1,11 @@
+package application.model;
+
+public class OperationPerformer 
+{
+	public Double calc(String operation, Double o1, Double o2)
+	{
+		Double r = 0.0;
+		
+		return r;
+	}
+}

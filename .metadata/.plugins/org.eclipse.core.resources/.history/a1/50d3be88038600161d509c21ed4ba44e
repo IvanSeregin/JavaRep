@@ -1,0 +1,52 @@
+package application.view;
+
+import application.model.CalculatorModel;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.scene.control.*;
+import javafx.scene.control.Alert.AlertType;
+
+public class CalculatorController 
+{
+	CalculatorModel calcModel = new CalculatorModel();
+	private boolean isOperBtnClick = false;
+	
+	@FXML
+	private Button numBtn;
+	@FXML
+	private TextField numInput;
+	@FXML
+	private Label numLabel;
+	@FXML
+	private Button operBtn;
+	
+	
+	@FXML
+	private void onNumButtonClick(ActionEvent event)
+	{
+		ButtonAction ba = ButtonAction.valueOf(((Button) event.getSource()).idProperty().get());
+		numInput.setText(numInput.getText() + ba.doAction());
+	}
+	
+	@FXML
+	private void onOperBtnClick(ActionEvent event)
+	{
+		try
+		{
+			isOperBtnClick = true;
+			calcModel.setOperand1(Double.parseDouble(numInput.getText()));
+			numLabel.setText(calcModel.getOperand1().toString());
+			numInput.clear();
+			ButtonAction ba = ButtonAction.valueOf(((Button) event.getSource()).idProperty().get());
+		}
+		catch (Exception e)
+		{
+            Alert alert = new Alert(AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText("Attention!");
+            alert.setContentText("There is no number or a number format is incorrect");
+            alert.showAndWait();
+		}
+		
+	}
+}

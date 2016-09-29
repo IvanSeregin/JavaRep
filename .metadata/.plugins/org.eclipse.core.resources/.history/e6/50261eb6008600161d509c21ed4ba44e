@@ -1,0 +1,7 @@
+package application.model;
+
+public class CalculatorModel 
+{
+	String operand1;
+	String operand2;
+}
