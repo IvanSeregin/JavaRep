@@ -105,9 +105,61 @@ public class GraphAdjMatrix extends Graph {
 	 */	
 	public List<Integer> getDistance2(int v) {
 		// XXX Implement this method in week 2
-		return null;
+		int[][] matrix = new int[getNumVertices()][getNumVertices()];
+		matrix = multMatrix(adjMatrix, adjMatrix); 
+		List<Integer> list = new ArrayList<Integer>();
+		
+		for (int i=0; i<getNumVertices(); i++)
+		{
+			if (matrix[v][i]!=0)
+			{
+				for (int j=0; j<matrix[v][i]; j++)
+					list.add(i);
+			}
+		}
+		//System.out.println("Multiplied matrix:");
+		//printMatrix(matrix);
+		return list;
 	}
 	
+	private void printMatrix(int[][] m)
+	{
+
+		int v = getNumVertices();
+		String s = "";
+		for (int i=0; i<v; i++)
+		{
+			s="";
+			for (int j=0; j<v; j++)
+			{	
+				s +=m[i][j] + "   ";
+			}
+			System.out.println(s);
+		}
+	}
+	
+	private int[][] multMatrix(int[][] m1, int[][] m2) {
+		// TODO Auto-generated method stub
+		int v = getNumVertices();
+		int[][] matrix = new int[v][v];;
+		int s = 0;
+		for (int i=0; i<v; i++)
+		{
+			for (int j=0; j<v; j++)
+			{	
+				s = 0;
+				for (int c=0; c<v; c++)
+				{
+					s += m1[i][c]*m2[c][j];
+				}
+				matrix[i][j]=s;
+			}
+			
+		}
+		
+		return matrix;
+	}
+
 	/**
 	 * Generate string representation of adjacency matrix
 	 * @return the String
