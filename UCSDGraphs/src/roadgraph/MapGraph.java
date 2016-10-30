@@ -8,7 +8,16 @@
 package roadgraph;
 
 
+import java.util.AbstractQueue;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.PriorityQueue;
+import java.util.Queue;
 import java.util.Set;
 import java.util.function.Consumer;
 
@@ -25,13 +34,20 @@ import util.GraphLoader;
 public class MapGraph {
 	//TODO: Add your member variables here in WEEK 3
 	
+	private List<GeographicPoint> vertices; //Holds vertices
+	private HashMap<GeographicPoint, List<GeographicPoint>> edges; //Holds edges (an adjacency list)   
+	private Map<String, Edge> edgeInfo; //Holds info about edges (street name, street type, etc.)
 	
 	/** 
 	 * Create a new empty MapGraph 
 	 */
+	//The constructor inits members
 	public MapGraph()
 	{
 		// TODO: Implement in this constructor in WEEK 3
+		vertices = new ArrayList<GeographicPoint> ();
+		edges = new HashMap<GeographicPoint, List<GeographicPoint>>();  
+		edgeInfo = new HashMap<String, Edge> ();
 	}
 	
 	/**
@@ -41,7 +57,7 @@ public class MapGraph {
 	public int getNumVertices()
 	{
 		//TODO: Implement this method in WEEK 3
-		return 0;
+		return vertices.size();
 	}
 	
 	/**
@@ -51,7 +67,7 @@ public class MapGraph {
 	public Set<GeographicPoint> getVertices()
 	{
 		//TODO: Implement this method in WEEK 3
-		return null;
+		return new HashSet<GeographicPoint> (edges.keySet());
 	}
 	
 	/**
@@ -61,10 +77,23 @@ public class MapGraph {
 	public int getNumEdges()
 	{
 		//TODO: Implement this method in WEEK 3
-		return 0;
+		int numEdges=0;
+		for (int i=0; i<vertices.size(); i++)
+		{
+			numEdges += (edges.get(vertices.get(i))).size(); 
+		}
+		return numEdges;
 	}
 
-	
+	/**
+	 * This my method. It returns the list of neighbors of the specified vertex
+	 * @param vertex We find neighbors of this vertex
+	 * @return
+	 */
+	private List<GeographicPoint> getNeighbors(GeographicPoint vertex)
+	{
+		return new ArrayList<GeographicPoint> (edges.get(vertex));
+	}
 	
 	/** Add a node corresponding to an intersection at a Geographic Point
 	 * If the location is already in the graph or null, this method does 
@@ -76,7 +105,12 @@ public class MapGraph {
 	public boolean addVertex(GeographicPoint location)
 	{
 		// TODO: Implement this method in WEEK 3
-		return false;
+		//trying to add the specified location as a vertex.
+		//if it's success, we put this vertex as a key value onto hashmap of edges
+		if (!vertices.add(location)) return false;
+		edges.put(location, new ArrayList<GeographicPoint> ());
+		
+		return true;
 	}
 	
 	/**
@@ -95,7 +129,26 @@ public class MapGraph {
 			String roadType, double length) throws IllegalArgumentException {
 
 		//TODO: Implement this method in WEEK 3
+		if (!vertices.contains(from) || !vertices.contains(to))
+		{
+			throw (new IllegalArgumentException());
+		}
 		
+		if (from==null || to==null)
+			throw (new IllegalArgumentException());
+		
+		if (length < 0)
+			throw (new IllegalArgumentException());
+		
+		//add edge from "from" to "to"
+		(edges.get(from)).add(to);
+		
+		//System.out.println(edges.get(from));
+		//System.out.println(from + " --> " + to);
+		
+		//add info about the current edge in edgeInfo
+		Edge e = new Edge(from, to, roadName, roadType, length);
+		edgeInfo.put(roadName, e);
 	}
 	
 
@@ -126,8 +179,61 @@ public class MapGraph {
 		// TODO: Implement this method in WEEK 3
 		
 		// Hook for visualization.  See writeup.
-		//nodeSearched.accept(next.getLocation());
-
+		
+		System.out.println("BFS is in progress...");
+		
+		//I think there is no comment are needed because this algorithm is from the lectures
+		//Everything is obvious here.
+		
+		if (!vertices.contains(start) || !vertices.contains(goal))
+		{
+			return null;
+		}
+		
+		LinkedList<GeographicPoint> queue = new LinkedList <GeographicPoint>();
+		GeographicPoint curr = new GeographicPoint(start.x, start.y);
+		Set<GeographicPoint> visited = new HashSet<GeographicPoint>();
+		Map<GeographicPoint, List<GeographicPoint>> parent = new HashMap<GeographicPoint, List<GeographicPoint>>();
+		for(GeographicPoint pt : getVertices())
+		{
+			parent.put(pt, new ArrayList<GeographicPoint> ());
+		}
+		
+		queue.add(start);
+		visited.add(start);
+		
+		while (!queue.isEmpty())
+		{
+			curr = queue.remove();
+			
+			if(curr.equals(goal)) 
+			{
+				System.out.println("Goal is "+curr);
+				System.out.println("Parent map is "+parent);
+				List<GeographicPoint> path = new ArrayList<GeographicPoint>();
+				
+				while (!curr.equals(start))
+				{
+					path.add(curr);
+					curr = parent.get(curr).get(0);
+				}
+				path.add(curr);
+				Collections.reverse(path);
+				return path;
+			}
+			
+			for (GeographicPoint n: getNeighbors(curr))
+			{
+				if (!visited.contains(n)) 
+				{
+					visited.add(n);
+					(parent.get(n)).add(curr);
+					queue.add(n);
+					nodeSearched.accept(n);
+				}
+			}			
+		}
+		System.out.println("BFS is done.");
 		return null;
 	}
 	
@@ -206,6 +312,17 @@ public class MapGraph {
 		System.out.print("DONE. \nLoading the map...");
 		GraphLoader.loadRoadMap("data/testdata/simpletest.map", firstMap);
 		System.out.println("DONE.");
+		
+		System.out.println("Number of vertices: " + firstMap.getNumVertices());
+		System.out.println("Number of edges: " + firstMap.getNumEdges());
+		System.out.println("List of vertices: " + firstMap.getVertices());
+		
+		GeographicPoint start = new GeographicPoint(4.0, -1.0);
+		GeographicPoint end= new GeographicPoint(4.0, 1.0);
+		
+		List<GeographicPoint> list = new ArrayList<GeographicPoint>();
+		list = firstMap.bfs(start, end);
+		System.out.println("Path from {---" + start +"---} to {---" + end + "---} is "+list);
 		
 		// You can use this method for testing.  
 		

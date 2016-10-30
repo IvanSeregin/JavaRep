@@ -2,8 +2,10 @@ package geography;
 
 import java.awt.geom.Point2D.Double;
 
+import roadgraph.Edge;
+
 @SuppressWarnings("serial")
-public class GeographicPoint extends Double {
+public class GeographicPoint extends Double{
 	
 	public GeographicPoint(double latitude, double longitude)
 	{
@@ -45,5 +47,19 @@ public class GeographicPoint extends Double {
     	return "Lat: " + getX() + ", Lon: " + getY();
     }
 	
-	
+    @Override
+    public boolean equals(Object obj)
+    {
+		if (!(obj instanceof GeographicPoint))
+			return false;
+		if (obj == this)
+			return true;
+		
+		if (((GeographicPoint)obj).x == this.getX() && ((GeographicPoint)obj).y == this.getY())
+		{
+			return true;
+		}
+		
+		return false;
+    }
 }
