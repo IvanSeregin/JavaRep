@@ -5,7 +5,7 @@ import java.awt.geom.Point2D.Double;
 import roadgraph.Edge;
 
 @SuppressWarnings("serial")
-public class GeographicPoint extends Double{
+public class GeographicPoint extends Double implements Comparable<GeographicPoint>{
 	
 	public GeographicPoint(double latitude, double longitude)
 	{
@@ -62,4 +62,13 @@ public class GeographicPoint extends Double{
 		
 		return false;
     }
+
+	@Override
+	public int compareTo(GeographicPoint arg0) {
+		// TODO Auto-generated method stub
+		
+		return 0;
+	}
+    
+    
 }

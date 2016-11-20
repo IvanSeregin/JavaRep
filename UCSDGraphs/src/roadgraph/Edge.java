@@ -8,7 +8,7 @@ package roadgraph;
 
 import geography.GeographicPoint;
 
-public class Edge {
+public class Edge implements Comparable <Edge>{
 	private GeographicPoint from;
 	private GeographicPoint to;
 	private String roadName;
@@ -48,5 +48,12 @@ public class Edge {
 		this.roadName = roadName;
 		this.roadType = roadType;
 		this.length = length;
+	}
+
+	@Override
+	public int compareTo(Edge arg0) {
+		if (this.length<arg0.length) return -1;
+		if (this.length>arg0.length) return 1;
+		return 0;
 	}
 }

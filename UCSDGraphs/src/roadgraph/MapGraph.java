@@ -34,7 +34,7 @@ import util.GraphLoader;
 public class MapGraph {
 	//TODO: Add your member variables here in WEEK 3
 	
-	private List<GeographicPoint> vertices; //Holds vertices
+	private List<Node> vertices; //Holds vertices
 	private HashMap<GeographicPoint, List<GeographicPoint>> edges; //Holds edges (an adjacency list)   
 	private Map<String, Edge> edgeInfo; //Holds info about edges (street name, street type, etc.)
 	
@@ -45,7 +45,7 @@ public class MapGraph {
 	public MapGraph()
 	{
 		// TODO: Implement in this constructor in WEEK 3
-		vertices = new ArrayList<GeographicPoint> ();
+		vertices = new ArrayList<Node> ();
 		edges = new HashMap<GeographicPoint, List<GeographicPoint>>();  
 		edgeInfo = new HashMap<String, Edge> ();
 	}
@@ -80,7 +80,7 @@ public class MapGraph {
 		int numEdges=0;
 		for (int i=0; i<vertices.size(); i++)
 		{
-			numEdges += (edges.get(vertices.get(i))).size(); 
+			numEdges += (edges.get(vertices.get(i).getLocation())).size(); 
 		}
 		return numEdges;
 	}
@@ -107,7 +107,8 @@ public class MapGraph {
 		// TODO: Implement this method in WEEK 3
 		//trying to add the specified location as a vertex.
 		//if it's success, we put this vertex as a key value onto hashmap of edges
-		if (!vertices.add(location)) return false;
+		Node n = new Node(location, 1000000);
+		if (!vertices.add(n)) return false;
 		edges.put(location, new ArrayList<GeographicPoint> ());
 		
 		return true;
@@ -129,7 +130,9 @@ public class MapGraph {
 			String roadType, double length) throws IllegalArgumentException {
 
 		//TODO: Implement this method in WEEK 3
-		if (!vertices.contains(from) || !vertices.contains(to))
+		
+		//if (!vertices.contains(from) || !vertices.contains(to))
+		if (!Node.contains(vertices, from) || !Node.contains(vertices, to))
 		{
 			throw (new IllegalArgumentException());
 		}
@@ -268,6 +271,60 @@ public class MapGraph {
 		// Hook for visualization.  See writeup.
 		//nodeSearched.accept(next.getLocation());
 		
+		System.out.println("dijkstra is in progress...");
+		
+		//I think there is no comment are needed because this algorithm is from the lectures
+		//Everything is obvious here.
+		
+		if (!Node.contains(vertices, start) || !Node.contains(vertices, goal))
+		{
+			return null;
+		}
+		
+		Queue <GeographicPoint> queue = new PriorityQueue  <GeographicPoint>();
+		GeographicPoint curr = new GeographicPoint(start.x, start.y);
+		Set<GeographicPoint> visited = new HashSet<GeographicPoint>();
+		Map<GeographicPoint, List<GeographicPoint>> parent = new HashMap<GeographicPoint, List<GeographicPoint>>();
+		for(GeographicPoint pt : getVertices())
+		{
+			parent.put(pt, new ArrayList<GeographicPoint> ());
+		}
+		
+		queue.add(start);
+		visited.add(start);
+		
+		while (!queue.isEmpty())
+		{
+			curr = queue.remove();
+			
+			if(curr.equals(goal)) 
+			{
+				System.out.println("Goal is "+curr);
+				System.out.println("Parent map is "+parent);
+				List<GeographicPoint> path = new ArrayList<GeographicPoint>();
+				
+				while (!curr.equals(start))
+				{
+					path.add(curr);
+					curr = parent.get(curr).get(0);
+				}
+				path.add(curr);
+				Collections.reverse(path);
+				return path;
+			}
+			
+			for (GeographicPoint n: getNeighbors(curr))
+			{
+				if (!visited.contains(n)) 
+				{
+					visited.add(n);
+					(parent.get(n)).add(curr);
+					queue.add(n);
+					nodeSearched.accept(n);
+				}
+			}			
+		}
+		System.out.println("dijkstra is done.");
 		return null;
 	}
 
@@ -317,11 +374,12 @@ public class MapGraph {
 		System.out.println("Number of edges: " + firstMap.getNumEdges());
 		System.out.println("List of vertices: " + firstMap.getVertices());
 		
-		GeographicPoint start = new GeographicPoint(4.0, -1.0);
-		GeographicPoint end= new GeographicPoint(4.0, 1.0);
+		GeographicPoint start = new GeographicPoint(1.0, 1.0);
+		GeographicPoint end= new GeographicPoint(8.0, -1.0);
+		
 		
 		List<GeographicPoint> list = new ArrayList<GeographicPoint>();
-		list = firstMap.bfs(start, end);
+		list = firstMap.dijkstra(start, end);
 		System.out.println("Path from {---" + start +"---} to {---" + end + "---} is "+list);
 		
 		// You can use this method for testing.  
