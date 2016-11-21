@@ -2,7 +2,7 @@ package geography;
 
 import java.awt.geom.Point2D.Double;
 
-import roadgraph.Edge;
+import roadgraph.MapEdge;
 
 @SuppressWarnings("serial")
 public class GeographicPoint extends Double implements Comparable<GeographicPoint>{
