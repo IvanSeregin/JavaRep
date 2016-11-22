@@ -273,10 +273,16 @@ public class MapGraph {
 		// Hook for visualization.  See writeup.
 		//nodeSearched.accept(next.getLocation());
 		
+		
+		
 		if (start == null || goal == null)
 			throw new NullPointerException("Cannot find route from or to null node");
-		MapNode startNode = pointNodeMap.get(start);
-		MapNode endNode = pointNodeMap.get(goal);
+		
+		HashMap<GeographicPoint,MapNode> nodes = new HashMap<GeographicPoint,MapNode>();
+		nodes.putAll(pointNodeMap);
+		MapNode startNode = nodes.get(start);
+		MapNode endNode = nodes.get(goal);
+		
 		if (startNode == null) {
 			System.err.println("Start node " + start + " does not exist");
 			return null;
@@ -286,30 +292,52 @@ public class MapGraph {
 			return null;
 		}
 
+		
+		
 		// setup to begin BFS
 		HashMap<MapNode,MapNode> parentMap = new HashMap<MapNode,MapNode>();
 		PriorityQueue<MapNode> toExplore = new PriorityQueue<MapNode>();
 		HashSet<MapNode> visited = new HashSet<MapNode>();
+		startNode.setDistanceToNode(0);
 		toExplore.add(startNode);
-		MapNode next = null;
+		MapNode curr = null;
+		double d1=0.0, d2=0.0;
 
-		while (!toExplore.isEmpty()) {
-			next = toExplore.remove();
+		while (!toExplore.isEmpty()) 
+		{
+			curr = toExplore.remove();
 			
-			 // hook for visualization
-			nodeSearched.accept(next.getLocation());
-			
-			if (next.equals(endNode)) break;
-			Set<MapNode> neighbors = getNeighbors(next);
-			for (MapNode neighbor : neighbors) {
-				if (!visited.contains(neighbor)) {
-					visited.add(neighbor);
-					parentMap.put(neighbor, next);
-					toExplore.add(neighbor);
+			if (!visited.contains(curr)) 
+			{
+				visited.add(curr);
+				if (curr.equals(endNode)) break;
+				// hook for visualization
+				//nodeSearched.accept(next.getLocation());
+				
+				Set<MapNode> neighbors = getNeighbors(curr);
+				
+				
+				for (MapNode n : neighbors) 
+				{
+					d1=1000000;
+					if (!visited.contains(n)) 
+					{
+						d2 = curr.getLocation().distance(n.getLocation());
+						//if (d2<d1)
+						{
+							d1=d2;
+							if (pointNodeMap.get(n.getLocation()).getDistanceToNode() > curr.getDistanceToNode() + d2)
+							{
+								n.setDistanceToNode(curr.getLocation().distance(n.getLocation()) + curr.getDistanceToNode());
+								toExplore.add(n);
+								parentMap.put(n, curr);
+							}
+						}
+					}
 				}
 			}
 		}
-		if (!next.equals(endNode)) {
+		if (!curr.equals(endNode)) {
 			System.out.println("No path found from " +start+ " to " + goal);
 			return null;
 		}

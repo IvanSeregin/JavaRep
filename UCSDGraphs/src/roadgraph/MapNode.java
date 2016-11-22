@@ -108,7 +108,7 @@ class MapNode implements Comparable<MapNode>
 	@Override
 	public String toString()
 	{
-		String toReturn = "[NODE at location (" + location + ")";
+		String toReturn = "Distance to node: "+distanceToNode+"[NODE at location (" + location + ")";
 		toReturn += " intersects streets: ";
 		for (MapEdge e: edges) {
 			toReturn += e.getRoadName() + ", ";
