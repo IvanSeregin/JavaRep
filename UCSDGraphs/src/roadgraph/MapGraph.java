@@ -301,7 +301,7 @@ public class MapGraph {
 		startNode.setDistanceToNode(0);
 		toExplore.add(startNode);
 		MapNode curr = null;
-		double d1=0.0, d2=0.0;
+		double d2=0.0;
 
 		while (!toExplore.isEmpty()) 
 		{
@@ -319,13 +319,11 @@ public class MapGraph {
 				
 				for (MapNode n : neighbors) 
 				{
-					d1=1000000;
 					if (!visited.contains(n)) 
 					{
 						d2 = curr.getLocation().distance(n.getLocation());
 						//if (d2<d1)
 						{
-							d1=d2;
 							if (pointNodeMap.get(n.getLocation()).getDistanceToNode() > curr.getDistanceToNode() + d2)
 							{
 								n.setDistanceToNode(curr.getLocation().distance(n.getLocation()) + curr.getDistanceToNode());
@@ -377,7 +375,75 @@ public class MapGraph {
 		// Hook for visualization.  See writeup.
 		//nodeSearched.accept(next.getLocation());
 		
-		return null;
+		if (start == null || goal == null)
+			throw new NullPointerException("Cannot find route from or to null node");
+		
+		HashMap<GeographicPoint,MapNode> nodes = new HashMap<GeographicPoint,MapNode>();
+		nodes.putAll(pointNodeMap);
+		MapNode startNode = nodes.get(start);
+		MapNode endNode = nodes.get(goal);
+		
+		if (startNode == null) {
+			System.err.println("Start node " + start + " does not exist");
+			return null;
+		}
+		if (endNode == null) {
+			System.err.println("End node " + goal + " does not exist");
+			return null;
+		}
+
+		
+		
+		// setup to begin BFS
+		HashMap<MapNode,MapNode> parentMap = new HashMap<MapNode,MapNode>();
+		PriorityQueue<MapNode> toExplore = new PriorityQueue<MapNode>();
+		HashSet<MapNode> visited = new HashSet<MapNode>();
+		startNode.setDistanceToNode(0);
+		toExplore.add(startNode);
+		MapNode curr = null;
+		double d2=0.0;
+
+		while (!toExplore.isEmpty()) 
+		{
+			curr = toExplore.remove();
+			
+			if (!visited.contains(curr)) 
+			{
+				visited.add(curr);
+				if (curr.equals(endNode)) break;
+				// hook for visualization
+				//nodeSearched.accept(next.getLocation());
+				
+				Set<MapNode> neighbors = getNeighbors(curr);
+				
+				
+				for (MapNode n : neighbors) 
+				{
+					if (!visited.contains(n)) 
+					{
+						d2 = curr.getLocation().distance(n.getLocation());
+						//if (d2<d1)
+						{
+							if (pointNodeMap.get(n.getLocation()).getDistanceToNode() > curr.getDistanceToNode() + d2)
+							{
+								n.setDistanceToNode(curr.getLocation().distance(n.getLocation()) + curr.getDistanceToNode() + n.getLocation().distance(goal));
+								toExplore.add(n);
+								parentMap.put(n, curr);
+							}
+						}
+					}
+				}
+			}
+		}
+		if (!curr.equals(endNode)) {
+			System.out.println("No path found from " +start+ " to " + goal);
+			return null;
+		}
+		// Reconstruct the parent path
+		List<GeographicPoint> path =
+				reconstructPath(parentMap, startNode, endNode);
+
+		return path;
 	}
 
 	
@@ -399,7 +465,7 @@ public class MapGraph {
 		
 		
 		List<GeographicPoint> list = new ArrayList<GeographicPoint>();
-		list = firstMap.dijkstra(start, end);
+		list = firstMap.aStarSearch(start, end);
 		System.out.println("Path from {---" + start +"---} to {---" + end + "---} is "+list);
 		
 		// You can use this method for testing.  
