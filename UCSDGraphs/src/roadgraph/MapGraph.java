@@ -292,7 +292,7 @@ public class MapGraph {
 			return null;
 		}
 
-		
+		System.out.println("Dijkstra is in progress");
 		
 		// setup to begin BFS
 		HashMap<MapNode,MapNode> parentMap = new HashMap<MapNode,MapNode>();
@@ -302,11 +302,13 @@ public class MapGraph {
 		toExplore.add(startNode);
 		MapNode curr = null;
 		double d2=0.0;
+		int i=0;
 
 		while (!toExplore.isEmpty()) 
 		{
 			curr = toExplore.remove();
-			
+			System.out.println(curr);
+			i++;
 			if (!visited.contains(curr)) 
 			{
 				visited.add(curr);
@@ -335,6 +337,9 @@ public class MapGraph {
 				}
 			}
 		}
+		
+		
+		System.out.println ("Number of nodes: " + i);
 		if (!curr.equals(endNode)) {
 			System.out.println("No path found from " +start+ " to " + goal);
 			return null;
@@ -373,8 +378,8 @@ public class MapGraph {
 		// TODO: Implement this method in WEEK 3
 		
 		// Hook for visualization.  See writeup.
-		//nodeSearched.accept(next.getLocation());
 		
+		System.out.println("A* is in progress");
 		if (start == null || goal == null)
 			throw new NullPointerException("Cannot find route from or to null node");
 		
@@ -402,17 +407,19 @@ public class MapGraph {
 		toExplore.add(startNode);
 		MapNode curr = null;
 		double d2=0.0;
-
+		//nodeSearched.accept(curr.getLocation());
+		int i=0;
 		while (!toExplore.isEmpty()) 
 		{
 			curr = toExplore.remove();
-			
+			System.out.println(curr);
+			i++;
 			if (!visited.contains(curr)) 
 			{
 				visited.add(curr);
 				if (curr.equals(endNode)) break;
 				// hook for visualization
-				//nodeSearched.accept(next.getLocation());
+				nodeSearched.accept(curr.getLocation());
 				
 				Set<MapNode> neighbors = getNeighbors(curr);
 				
@@ -421,12 +428,10 @@ public class MapGraph {
 				{
 					if (!visited.contains(n)) 
 					{
-						d2 = curr.getLocation().distance(n.getLocation());
-						//if (d2<d1)
 						{
-							if (pointNodeMap.get(n.getLocation()).getDistanceToNode() > curr.getDistanceToNode() + d2)
+							if ((pointNodeMap.get(n.getLocation()).getDistanceToNode() > curr.getDistanceToNode() + d2))
 							{
-								n.setDistanceToNode(curr.getLocation().distance(n.getLocation()) + curr.getDistanceToNode() + n.getLocation().distance(goal));
+								n.setDistanceToNode(n.getLocation().distance(goal));
 								toExplore.add(n);
 								parentMap.put(n, curr);
 							}
@@ -435,6 +440,8 @@ public class MapGraph {
 				}
 			}
 		}
+		
+		System.out.println ("Number of nodes: " + i);
 		if (!curr.equals(endNode)) {
 			System.out.println("No path found from " +start+ " to " + goal);
 			return null;
@@ -475,14 +482,12 @@ public class MapGraph {
 		System.out.print("DONE. \nLoading the map...");
 		GraphLoader.loadRoadMap("data/maps/utc.map", theMap);
 		System.out.println("DONE.");
-
 		GeographicPoint start = new GeographicPoint(32.8648772, -117.2254046);
 		GeographicPoint end = new GeographicPoint(32.8660691, -117.217393);
 		
 		
 		List<GeographicPoint> route = theMap.dijkstra(start,end);
 		List<GeographicPoint> route2 = theMap.aStarSearch(start,end);
-
 		*/
 		
 	}
