@@ -396,8 +396,6 @@ public class MapGraph {
 			System.err.println("End node " + goal + " does not exist");
 			return null;
 		}
-
-		
 		
 		// setup to begin BFS
 		HashMap<MapNode,MapNode> parentMap = new HashMap<MapNode,MapNode>();
@@ -452,8 +450,73 @@ public class MapGraph {
 
 		return path;
 	}
-
 	
+	private boolean isHamiltonian()
+	{
+		/*
+		Теорема 19. (Дирак). Граф гамильтонов, если степень любой
+				его вершины удовлетворяет неравенству deg v >= n/2.
+		Теорема 20. (Оре О.).Граф гамильтонов, если степени любых 
+				двух его несмежных вершин v и u удовлетворяет неравенству
+				deg v + deg u >= n.
+		*/
+		List<MapNode> nodes = new ArrayList<MapNode>(pointNodeMap.values());
+		int v = getVertices().size(); 
+		boolean isHam;
+	
+		//1st check
+		isHam = true;
+		for (MapNode n : nodes)
+		{
+			if (this.getNeighbors(n).size() < v/2) 
+				isHam=false; 
+			break;
+		}
+		
+		//if isHam is true, then the graph is a hamiltonian graph.
+		//In other case it might be not a hamiltonian
+		//so we need to check it against the second condition.
+		if (isHam) return true;
+		
+		//2nd check
+		isHam = true;
+		Set<MapNode> neighborsI;
+		Set<MapNode> neighborsJ;
+		for (MapNode i : nodes)
+		{
+			for (MapNode j : nodes)
+			{
+				//is J reachable form I???
+				neighborsJ = this.getNeighbors(j);
+				if (!neighborsJ.contains(i))
+				{
+					neighborsI = this.getNeighbors(i);
+					if ((neighborsI.size() + neighborsJ.size()) < v)
+					{
+						isHam=false; 
+						break;
+					}
+				}
+			}
+			if (!isHam) break;
+		}
+		if (isHam) return true;
+		
+		return false;
+	}
+	
+	public List<GeographicPoint> salsemanPath(GeographicPoint start)
+	{
+		if (this.isHamiltonian())
+		{
+			System.out.println("The map is hamiltonian, I'm trying to find a greedy path");
+		}
+		else
+		{
+			System.out.println("Maybe the map is not hamiltonian");
+		}
+		return null;
+	}
 	
 	public static void main(String[] args)
 	{
@@ -463,6 +526,11 @@ public class MapGraph {
 		GraphLoader.loadRoadMap("data/testdata/simpletest.map", firstMap);
 		System.out.println("DONE.");
 		
+		System.out.println("Number of vertices: " + firstMap.getNumVertices());
+		GeographicPoint start = new GeographicPoint(4.0, 1.0);
+		firstMap.salsemanPath(start);
+		
+		/*
 		System.out.println("Number of vertices: " + firstMap.getNumVertices());
 		System.out.println("Number of edges: " + firstMap.getNumEdges());
 		System.out.println("List of vertices: " + firstMap.getVertices());
@@ -474,7 +542,7 @@ public class MapGraph {
 		List<GeographicPoint> list = new ArrayList<GeographicPoint>();
 		list = firstMap.aStarSearch(start, end);
 		System.out.println("Path from {---" + start +"---} to {---" + end + "---} is "+list);
-		
+		*/
 		// You can use this method for testing.  
 		
 		/* Use this code in Week 3 End of Week Quiz
