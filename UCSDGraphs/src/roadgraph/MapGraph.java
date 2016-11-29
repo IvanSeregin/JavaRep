@@ -11,6 +11,7 @@ package roadgraph;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.PriorityQueue;
@@ -451,37 +452,26 @@ public class MapGraph {
 		return path;
 	}
 	
-	private boolean isHamiltonian()
+	private boolean dirak()
 	{
-		/*
-		Теорема 19. (Дирак). Граф гамильтонов, если степень любой
-				его вершины удовлетворяет неравенству deg v >= n/2.
-		Теорема 20. (Оре О.).Граф гамильтонов, если степени любых 
-				двух его несмежных вершин v и u удовлетворяет неравенству
-				deg v + deg u >= n.
-		*/
 		List<MapNode> nodes = new ArrayList<MapNode>(pointNodeMap.values());
 		int v = getVertices().size(); 
-		boolean isHam;
 	
 		//1st check
-		isHam = true;
 		for (MapNode n : nodes)
 		{
 			if (this.getNeighbors(n).size() < v/2) 
-				isHam=false; 
-			break;
+				 return false; 
 		}
-		
-		//if isHam is true, then the graph is a hamiltonian graph.
-		//In other case it might be not a hamiltonian
-		//so we need to check it against the second condition.
-		if (isHam) return true;
-		
-		//2nd check
-		isHam = true;
+		return true;
+	}
+	
+	private boolean ore()
+	{
+		List<MapNode> nodes = new ArrayList<MapNode>(pointNodeMap.values());
 		Set<MapNode> neighborsI;
 		Set<MapNode> neighborsJ;
+		int v = getVertices().size(); 
 		for (MapNode i : nodes)
 		{
 			for (MapNode j : nodes)
@@ -493,23 +483,141 @@ public class MapGraph {
 					neighborsI = this.getNeighbors(i);
 					if ((neighborsI.size() + neighborsJ.size()) < v)
 					{
-						isHam=false; 
-						break;
+						 return false; 
 					}
 				}
 			}
-			if (!isHam) break;
 		}
-		if (isHam) return true;
+		
+		return true;
+	}
+	
+	private boolean isHamiltonian()
+	{
+		/*
+		Теорема 19. (Дирак). Граф гамильтонов, если степень любой
+				его вершины удовлетворяет неравенству deg v >= n/2.
+		Теорема 20. (Оре О.).Граф гамильтонов, если степени любых 
+				двух его несмежных вершин v и u удовлетворяет неравенству
+				deg v + deg u >= n.
+		*/
+		if (ore()) return true;
+		if (dirak()) return true;
+		
 		
 		return false;
 	}
 	
+	private MapNode searchNearest(MapNode node, Set<MapNode> nodes)
+	{
+		//search nearest element for a node among other nodes
+		double distance=0;
+		MapNode nearest = null; 
+		Iterator<MapNode> iter = nodes.iterator();
+		if (!nodes.isEmpty())
+		{
+			MapNode n = iter.next();
+			distance = node.getLocation().distance(n.getLocation());
+			nearest = n;
+		    while(iter.hasNext()) 
+		    {
+		        n = iter.next();
+		        double newDist = node.getLocation().distance(n.getLocation());
+		        if (newDist<distance)
+		        {
+		        	distance = newDist;
+		        	nearest = n;
+		        }
+		    }
+		}
+		return nearest;
+	}
+	
+	private Set<MapNode> minDegreeNodes(Set<MapNode> neighbors, Set<MapNode> visited)
+	{
+		//find the maximum degree of edges which are in neighbors
+		Iterator<MapNode> iter = neighbors.iterator();
+		Set<MapNode> notVisitedNeighbors = new HashSet<MapNode>();
+		Set<MapNode> neighborsOfCurr = new HashSet<MapNode>();
+		if (!neighbors.isEmpty())
+		{
+			MapNode n = iter.next();
+			int edgesNum = 0;
+			neighborsOfCurr = n.getNeighbors();
+			neighborsOfCurr.removeAll(visited);
+			edgesNum = neighborsOfCurr.size();
+			
+			while (iter.hasNext())
+			{
+				n = iter.next();
+				neighborsOfCurr = n.getNeighbors();
+				neighborsOfCurr.removeAll(visited);
+				if (edgesNum>neighborsOfCurr.size())
+				{
+					edgesNum = neighborsOfCurr.size();
+				}
+			}
+			//once maximum degree is know remove all vertices from 
+			//neighbors with other degrees
+			iter = neighbors.iterator();
+			while (iter.hasNext())
+			{
+				n = iter.next();
+				neighborsOfCurr = n.getNeighbors();
+				neighborsOfCurr.removeAll(visited);
+				if (neighborsOfCurr.size() == edgesNum)
+				{
+					notVisitedNeighbors.add(n);
+				}
+			}
+		}
+		return notVisitedNeighbors;
+	}
+	
+	private List<GeographicPoint> greedy(GeographicPoint start)
+	{
+		HashMap<GeographicPoint,MapNode> nodes = new HashMap<GeographicPoint,MapNode>();
+		nodes.putAll(pointNodeMap);
+		MapNode curr;
+		LinkedList<GeographicPoint> path = new LinkedList<GeographicPoint>();
+		Queue<MapNode> toExplore = new LinkedList<MapNode>();
+		HashSet<MapNode> visited = new HashSet<MapNode>();
+		Set<MapNode> neighbors;
+		
+		toExplore.add(nodes.get(start));
+		while (!toExplore.isEmpty()) 
+		{
+			curr = toExplore.remove();
+			visited.add(curr);
+			path.add(curr.getLocation());
+			neighbors = curr.getNeighbors();
+			
+			neighbors.removeAll(visited);
+			neighbors = minDegreeNodes(neighbors, visited);
+			
+			if (!neighbors.isEmpty())
+				toExplore.add(searchNearest (curr, neighbors));
+		}
+		
+		return path;
+	}
+	
+	/*
+	 * This method traverses all nodes in a graph. It tries to
+	 * traverse nodes just once if it's possible. It's possible if
+	 * the graph is a hamiltonian graph.
+	 * Otherwise, it tries to traverse all the nodes in the graph
+	 * visiting them more than once.
+	 * Firstly, we check whether the graph is a Hamiltonian one or not.
+	 * If yes, greedy algorithm starts. This algorithm find nodes that have minimum +- degree
+	 * and find the nearest node among these nodes.
+	 */
 	public List<GeographicPoint> salsemanPath(GeographicPoint start)
 	{
 		if (this.isHamiltonian())
 		{
 			System.out.println("The map is hamiltonian, I'm trying to find a greedy path");
+			System.out.println (greedy(start));
 		}
 		else
 		{
@@ -518,13 +626,19 @@ public class MapGraph {
 		return null;
 	}
 	
+
+	
 	public static void main(String[] args)
 	{
 		System.out.print("Making a new map...");
 		MapGraph firstMap = new MapGraph();
 		System.out.print("DONE. \nLoading the map...");
-		GraphLoader.loadRoadMap("data/testdata/simpletest.map", firstMap);
+		GraphLoader.loadRoadMap("data/testdata/hamilton.map", firstMap);
 		System.out.println("DONE.");
+		
+		GeographicPoint p1 = new GeographicPoint(4.0, -1.0);
+		GeographicPoint p2 = new GeographicPoint(8.0, -1.0);
+		System.out.println(p1.distance(p2));
 		
 		System.out.println("Number of vertices: " + firstMap.getNumVertices());
 		GeographicPoint start = new GeographicPoint(4.0, 1.0);
