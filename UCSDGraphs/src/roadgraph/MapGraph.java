@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Set;
+import java.util.Stack;
 import java.util.function.Consumer;
 
 import geography.GeographicPoint;
@@ -602,6 +603,33 @@ public class MapGraph {
 		return path;
 	}
 	
+	private List<GeographicPoint> nonGreedy(GeographicPoint start) 
+	{
+		/* Note that this method is a little long and we might think
+		 * about refactoring it to break it into shorter methods as we 
+		 * did in the Maze search code in week 2 */
+		
+		// Setup - check validity of inputs
+		HashMap<GeographicPoint,MapNode> nodes = new HashMap<GeographicPoint,MapNode>();
+		nodes.putAll(pointNodeMap);
+		
+		MapNode curr;
+		LinkedList<GeographicPoint> path = new LinkedList<GeographicPoint>();
+		Stack<MapNode> toExplore = new Stack<MapNode>();
+		HashSet<MapNode> visited = new HashSet<MapNode>();
+		Set<MapNode> neighbors;	
+		
+		toExplore.add(nodes.get(start));
+
+		while (!toExplore.isEmpty()) 
+		{
+			curr = toExplore.pop();
+			path.add
+		}
+
+		return path;
+	}	
+	
 	/*
 	 * This method traverses all nodes in a graph. It tries to
 	 * traverse nodes just once if it's possible. It's possible if
@@ -622,11 +650,10 @@ public class MapGraph {
 		else
 		{
 			System.out.println("Maybe the map is not hamiltonian");
+			nonGreedy(start);
 		}
 		return null;
 	}
-	
-
 	
 	public static void main(String[] args)
 	{
@@ -635,10 +662,6 @@ public class MapGraph {
 		System.out.print("DONE. \nLoading the map...");
 		GraphLoader.loadRoadMap("data/testdata/hamilton.map", firstMap);
 		System.out.println("DONE.");
-		
-		GeographicPoint p1 = new GeographicPoint(4.0, -1.0);
-		GeographicPoint p2 = new GeographicPoint(8.0, -1.0);
-		System.out.println(p1.distance(p2));
 		
 		System.out.println("Number of vertices: " + firstMap.getNumVertices());
 		GeographicPoint start = new GeographicPoint(4.0, 1.0);
