@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Set;
+import java.util.Stack;
 import java.util.function.Consumer;
 
 import geography.GeographicPoint;
@@ -602,6 +603,37 @@ public class MapGraph {
 		return path;
 	}
 	
+	
+	private List<GeographicPoint>  nonGreedy(GeographicPoint start) 
+	{
+		HashMap<GeographicPoint,MapNode> nodes = new HashMap<GeographicPoint,MapNode>();
+		nodes.putAll(pointNodeMap);
+		MapNode curr;
+		LinkedList<GeographicPoint> path = new LinkedList<GeographicPoint>();
+		Stack<MapNode> stack = new Stack<MapNode>();
+		HashSet<MapNode> visited = new HashSet<MapNode>();
+		HashMap<MapNode,Integer> fork = new HashMap<MapNode,Integer>();
+		
+		stack.push(nodes.get(start));
+		
+		while (!stack.isEmpty())
+		{
+			curr = stack.pop();
+			visited.add(curr);
+			path.add(curr.getLocation());
+			Set<MapNode> neighbors = curr.getNeighbors();
+			neighbors.removeAll(visited);
+			
+			if (neighbors.size() > 0)
+				fork.put(curr, neighbors.size());
+			
+			stack.addAll(neighbors);	
+		}
+		
+		return path;
+	}	
+	
+	
 	/*
 	 * This method traverses all nodes in a graph. It tries to
 	 * traverse nodes just once if it's possible. It's possible if
@@ -622,24 +654,23 @@ public class MapGraph {
 		else
 		{
 			System.out.println("Maybe the map is not hamiltonian");
+			System.out.println (nonGreedy(start));
 		}
 		return null;
 	}
 	
 
 	
+
+
 	public static void main(String[] args)
 	{
 		System.out.print("Making a new map...");
 		MapGraph firstMap = new MapGraph();
 		System.out.print("DONE. \nLoading the map...");
-		GraphLoader.loadRoadMap("data/testdata/hamilton.map", firstMap);
+		GraphLoader.loadRoadMap("data/testdata/simpletest.map", firstMap);
 		System.out.println("DONE.");
-		
-		GeographicPoint p1 = new GeographicPoint(4.0, -1.0);
-		GeographicPoint p2 = new GeographicPoint(8.0, -1.0);
-		System.out.println(p1.distance(p2));
-		
+			
 		System.out.println("Number of vertices: " + firstMap.getNumVertices());
 		GeographicPoint start = new GeographicPoint(4.0, 1.0);
 		firstMap.salsemanPath(start);
