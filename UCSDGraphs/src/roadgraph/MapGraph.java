@@ -603,7 +603,6 @@ public class MapGraph {
 		return path;
 	}
 	
-<<<<<<< HEAD
 	
 	private List<GeographicPoint>  nonGreedy(GeographicPoint start) 
 	{
@@ -635,35 +634,6 @@ public class MapGraph {
 	}	
 	
 	
-=======
-	private List<GeographicPoint> nonGreedy(GeographicPoint start) 
-	{
-		/* Note that this method is a little long and we might think
-		 * about refactoring it to break it into shorter methods as we 
-		 * did in the Maze search code in week 2 */
-		
-		// Setup - check validity of inputs
-		HashMap<GeographicPoint,MapNode> nodes = new HashMap<GeographicPoint,MapNode>();
-		nodes.putAll(pointNodeMap);
-		
-		MapNode curr;
-		LinkedList<GeographicPoint> path = new LinkedList<GeographicPoint>();
-		Stack<MapNode> toExplore = new Stack<MapNode>();
-		HashSet<MapNode> visited = new HashSet<MapNode>();
-		Set<MapNode> neighbors;	
-		
-		toExplore.add(nodes.get(start));
-
-		while (!toExplore.isEmpty()) 
-		{
-			curr = toExplore.pop();
-			path.add
-		}
-
-		return path;
-	}	
-	
->>>>>>> e5ca756b015b258f086ef1084ed6f2653bb503a2
 	/*
 	 * This method traverses all nodes in a graph. It tries to
 	 * traverse nodes just once if it's possible. It's possible if
@@ -684,22 +654,15 @@ public class MapGraph {
 		else
 		{
 			System.out.println("Maybe the map is not hamiltonian");
-<<<<<<< HEAD
 			System.out.println (nonGreedy(start));
-=======
-			nonGreedy(start);
->>>>>>> e5ca756b015b258f086ef1084ed6f2653bb503a2
 		}
 		return null;
 	}
 	
-<<<<<<< HEAD
 
 	
 
 
-=======
->>>>>>> e5ca756b015b258f086ef1084ed6f2653bb503a2
 	public static void main(String[] args)
 	{
 		System.out.print("Making a new map...");
@@ -707,11 +670,7 @@ public class MapGraph {
 		System.out.print("DONE. \nLoading the map...");
 		GraphLoader.loadRoadMap("data/testdata/simpletest.map", firstMap);
 		System.out.println("DONE.");
-<<<<<<< HEAD
 			
-=======
-		
->>>>>>> e5ca756b015b258f086ef1084ed6f2653bb503a2
 		System.out.println("Number of vertices: " + firstMap.getNumVertices());
 		GeographicPoint start = new GeographicPoint(4.0, 1.0);
 		firstMap.salsemanPath(start);
