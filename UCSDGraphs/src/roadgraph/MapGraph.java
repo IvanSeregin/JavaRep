@@ -600,7 +600,7 @@ public class MapGraph {
 	}
 	
 	
-	private List<MapNode>  nonGreedy(GeographicPoint start) 
+	private List<MapNode> nonGreedy(GeographicPoint start) 
 	{
 		HashMap<GeographicPoint,MapNode> nodes = new HashMap<GeographicPoint,MapNode>();
 		nodes.putAll(pointNodeMap);
@@ -612,14 +612,14 @@ public class MapGraph {
 		
 		stack.push(nodes.get(start));
 		
-		while (!stack.isEmpty())
+		while (!stack.isEmpty() && visited.size()!=nodes.size())
 		{
 			curr = stack.pop();
 			visited.add(curr);
 			path.add(curr);
 			Set<MapNode> neighbors = curr.getNeighbors();
 			neighbors.removeAll(visited);
-			
+					
 			if (neighbors.size() > 1)
 				fork.push(curr);
 			else if (neighbors.size() == 0)
@@ -629,15 +629,21 @@ public class MapGraph {
 				while (!fork.isEmpty())
 				{
 					tmpNode = fork.pop();
-					tmpPath = this.dijkstra(curr.getLocation(), tmpNode.getLocation());
-					if (!tmpPath.isEmpty())
+					
+					Set<MapNode> tmpNbhrs = tmpNode.getNeighbors();
+					tmpNbhrs.removeAll(visited);
+					if (!tmpNbhrs.isEmpty())
 					{
-						for (GeographicPoint t : tmpPath)
+						tmpPath = this.aStarSearch(curr.getLocation(), tmpNode.getLocation());
+						if (!tmpPath.isEmpty())
 						{
-							path.add(nodes.get(t));
+							for (int i=1; i<tmpPath.size()-1; i++)
+							{
+								path.add(nodes.get(tmpPath.get(i)));
+							}
+							stack.push(tmpNode);
+							break;
 						}
-						curr = tmpNode;
-						break;
 					}
 				}
 				
@@ -684,7 +690,7 @@ public class MapGraph {
 		System.out.print("Making a new map...");
 		MapGraph firstMap = new MapGraph();
 		System.out.print("DONE. \nLoading the map...");
-		GraphLoader.loadRoadMap("data/testdata/simpletest.map", firstMap);
+		GraphLoader.loadRoadMap("data/maps/utc.map", firstMap);
 		System.out.println("DONE.");
 			
 		System.out.println("Number of vertices: " + firstMap.getNumVertices());
