@@ -304,13 +304,10 @@ public class MapGraph {
 		toExplore.add(startNode);
 		MapNode curr = null;
 		double d2=0.0;
-		int i=0;
 
 		while (!toExplore.isEmpty()) 
 		{
 			curr = toExplore.remove();
-			System.out.println(curr);
-			i++;
 			if (!visited.contains(curr)) 
 			{
 				visited.add(curr);
@@ -341,7 +338,6 @@ public class MapGraph {
 		}
 		
 		
-		System.out.println ("Number of nodes: " + i);
 		if (!curr.equals(endNode)) {
 			System.out.println("No path found from " +start+ " to " + goal);
 			return null;
@@ -604,15 +600,15 @@ public class MapGraph {
 	}
 	
 	
-	private List<GeographicPoint>  nonGreedy(GeographicPoint start) 
+	private List<MapNode>  nonGreedy(GeographicPoint start) 
 	{
 		HashMap<GeographicPoint,MapNode> nodes = new HashMap<GeographicPoint,MapNode>();
 		nodes.putAll(pointNodeMap);
 		MapNode curr;
-		LinkedList<GeographicPoint> path = new LinkedList<GeographicPoint>();
+		LinkedList<MapNode> path = new LinkedList<MapNode>();
 		Stack<MapNode> stack = new Stack<MapNode>();
 		HashSet<MapNode> visited = new HashSet<MapNode>();
-		HashMap<MapNode,Integer> fork = new HashMap<MapNode,Integer>();
+		Stack<MapNode> fork = new Stack<MapNode>();
 		
 		stack.push(nodes.get(start));
 		
@@ -620,12 +616,32 @@ public class MapGraph {
 		{
 			curr = stack.pop();
 			visited.add(curr);
-			path.add(curr.getLocation());
+			path.add(curr);
 			Set<MapNode> neighbors = curr.getNeighbors();
 			neighbors.removeAll(visited);
 			
-			if (neighbors.size() > 0)
-				fork.put(curr, neighbors.size());
+			if (neighbors.size() > 1)
+				fork.push(curr);
+			else if (neighbors.size() == 0)
+			{
+				List<GeographicPoint> tmpPath = new LinkedList<GeographicPoint>();
+				MapNode tmpNode;
+				while (!fork.isEmpty())
+				{
+					tmpNode = fork.pop();
+					tmpPath = this.dijkstra(curr.getLocation(), tmpNode.getLocation());
+					if (!tmpPath.isEmpty())
+					{
+						for (GeographicPoint t : tmpPath)
+						{
+							path.add(nodes.get(t));
+						}
+						curr = tmpNode;
+						break;
+					}
+				}
+				
+			}	
 			
 			stack.addAll(neighbors);	
 		}
@@ -672,7 +688,7 @@ public class MapGraph {
 		System.out.println("DONE.");
 			
 		System.out.println("Number of vertices: " + firstMap.getNumVertices());
-		GeographicPoint start = new GeographicPoint(4.0, 1.0);
+		GeographicPoint start = new GeographicPoint(1.0, 1.0);
 		firstMap.salsemanPath(start);
 		
 		/*

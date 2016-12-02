@@ -108,6 +108,7 @@ class MapNode implements Comparable<MapNode>
 	@Override
 	public String toString()
 	{
+		/*
 		String toReturn = "Distance to node: "+distanceToNode+"[NODE at location (" + location + ")";
 		toReturn += " intersects streets: ";
 		for (MapEdge e: edges) {
@@ -115,6 +116,8 @@ class MapNode implements Comparable<MapNode>
 		}
 		toReturn += "]";
 		return toReturn;
+		*/
+		return this.getLocation().toString();
 	}
 
 	// For debugging, output roadNames as a String.
