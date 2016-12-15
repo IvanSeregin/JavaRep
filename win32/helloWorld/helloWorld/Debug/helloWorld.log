@@ -1,4 +1,4 @@
 ﻿  main.cpp
-d:\git\javarep\win32\helloworld\helloworld\main.cpp(28): warning C4302: приведение типов: усечение из "LPWSTR" в "WORD"
-d:\git\javarep\win32\helloworld\helloworld\main.cpp(33): warning C4302: приведение типов: усечение из "LPWSTR" в "WORD"
+d:\git\javarep\win32\helloworld\helloworld\main.cpp(28): warning C4302: 'type cast': truncation from 'LPWSTR' to 'WORD'
+d:\git\javarep\win32\helloworld\helloworld\main.cpp(33): warning C4302: 'type cast': truncation from 'LPWSTR' to 'WORD'
   helloWorld.vcxproj -> D:\git\JavaRep\win32\helloWorld\helloWorld\Debug\helloWorld.exe
