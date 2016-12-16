@@ -1,17 +1,22 @@
 #include "layout.h"
 
-void createMenu (HWND hWnd);
-void createRegeditTreeView(HWND hWnd);
-void createRegeditListView(HWND hWnd);
-
-void setupLayout(HWND hWnd)
+HWND createBtn(HWND hWnd)
 {
-	createMenu(hWnd);
-	createRegeditTreeView(hWnd);
-	createRegeditListView(hWnd);
+	HWND hwndBtnCancel = CreateWindow(
+		L"BUTTON",  // Predefined class; Unicode assumed 
+		L"Cancel",      // Button text 
+		WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON,  // Styles 
+		390,         // x position 
+		10,         // y position 
+		100,        // Button width
+		25,        // Button height
+		hWnd,     // Parent window
+		(HMENU)BTN_CANCEL,       // No menu.
+		(HINSTANCE)GetWindowLong(hWnd, GWL_HINSTANCE),
+		NULL);
+	return hwndBtnCancel;
 }
-
-void createMenu(HWND hWnd)
+HMENU createMenu(HWND hWnd)
 {
 	HMENU mainMenu = CreateMenu();
 	HMENU PopMenuFile = CreatePopupMenu();
@@ -39,9 +44,11 @@ void createMenu(HWND hWnd)
 	SetMenu(hWnd, PopMenuFind);
 	SetMenu(hWnd, PopMenuEdit);
 	SetMenu(hWnd, PopMenuEditObject);
+
+	return mainMenu;
 }
 
-void createRegeditTreeView(HWND hWnd)
+HWND createRegeditTreeView(HWND hWnd)
 {
 	HWND regeditTreeView = CreateWindowEx(0,
 		WC_TREEVIEW,
@@ -53,12 +60,13 @@ void createRegeditTreeView(HWND hWnd)
 		(HMENU)REG_TREE_VIEW,
 		(HINSTANCE)GetWindowLong(hWnd, GWL_HINSTANCE),
 		NULL);
+	return regeditTreeView;
 }
 
-void createRegeditListView(HWND hWnd)
+HWND createRegeditListView(HWND hWnd)
 {
 	// Create the list-view window in report view with label editing enabled.
-	HWND hWndListView = CreateWindowEx(0,
+	HWND regeditListView = CreateWindowEx(0,
 		WC_LISTVIEW,
 		TEXT("Реестр"),
 		WS_VISIBLE | WS_CHILD | LVS_REPORT | LVS_EDITLABELS | WS_BORDER,
@@ -68,4 +76,5 @@ void createRegeditListView(HWND hWnd)
 		(HMENU)REG_LIST_VIEW,
 		(HINSTANCE)GetWindowLong(hWnd, GWL_HINSTANCE),
 		NULL);
+	return regeditListView;
 }

@@ -8,6 +8,12 @@
 #include "layout.h"
 
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
+void setupWindow(HWND hWnd);
+
+
+HWND regeditTreeView;
+HWND regeditListView;
+HMENU mainMenu;
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
@@ -41,7 +47,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		return 1;
 	}
 
-	setupLayout(hWnd);
+	setupWindow(hWnd);
 
 	ShowWindow(hWnd, nCmdShow);
 	UpdateWindow(hWnd);
@@ -86,3 +92,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	}
 	return 0;
 }
+
+void setupWindow(HWND hWnd)
+{
+	regeditTreeView = createRegeditTreeView(hWnd);
+	regeditListView = createRegeditListView(hWnd);
+	mainMenu = createMenu(hWnd);
+}
+

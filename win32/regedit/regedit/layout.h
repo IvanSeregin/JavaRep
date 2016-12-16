@@ -1,6 +1,6 @@
 #pragma once
-#ifndef LAYOUT
-#define LAYOUT
+#ifndef _LAYOUT_H_
+#define _LAYOUT_H_
 
 #include <windows.h> 
 #include <CommCtrl.h>
@@ -17,5 +17,11 @@
 #define EDIT_BRANCH 109
 #define EDIT_KEY 110
 
-void setupLayout(HWND hWnd);
-#endif
+#define BTN_CANCEL 111
+
+HWND createRegeditTreeView(HWND hWnd);
+HWND createRegeditListView(HWND hWnd);
+HMENU createMenu(HWND hWnd);
+
+HWND createBtn(HWND hWnd);
+#endif //_LAYOUT_H

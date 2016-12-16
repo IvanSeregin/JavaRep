@@ -1,4 +1,4 @@
 ﻿  Main.cpp
-d:\git\javarep\win32\regedit\regedit\main.cpp(24): warning C4302: приведение типов: усечение из "LPWSTR" в "WORD"
-d:\git\javarep\win32\regedit\regedit\main.cpp(29): warning C4302: приведение типов: усечение из "LPWSTR" в "WORD"
+d:\git\javarep\win32\regedit\regedit\main.cpp(30): warning C4302: 'type cast': truncation from 'LPWSTR' to 'WORD'
+d:\git\javarep\win32\regedit\regedit\main.cpp(35): warning C4302: 'type cast': truncation from 'LPWSTR' to 'WORD'
   regedit.vcxproj -> D:\git\JavaRep\win32\regedit\Debug\regedit.exe
