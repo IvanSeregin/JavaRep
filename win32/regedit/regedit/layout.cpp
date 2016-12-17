@@ -1,21 +1,6 @@
-#include "layout.h"
+#include "definitions.h"
+#include "resource.h"
 
-HWND createBtn(HWND hWnd)
-{
-	HWND hwndBtnCancel = CreateWindow(
-		L"BUTTON",  // Predefined class; Unicode assumed 
-		L"Cancel",      // Button text 
-		WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON,  // Styles 
-		390,         // x position 
-		10,         // y position 
-		100,        // Button width
-		25,        // Button height
-		hWnd,     // Parent window
-		(HMENU)BTN_CANCEL,       // No menu.
-		(HINSTANCE)GetWindowLong(hWnd, GWL_HINSTANCE),
-		NULL);
-	return hwndBtnCancel;
-}
 HMENU createMenu(HWND hWnd)
 {
 	HMENU mainMenu = CreateMenu();
@@ -48,18 +33,29 @@ HMENU createMenu(HWND hWnd)
 	return mainMenu;
 }
 
-HWND createRegeditTreeView(HWND hWnd)
+HWND createRegeditTreeView(HWND hWnd, HINSTANCE hInstance)
 {
 	HWND regeditTreeView = CreateWindowEx(0,
 		WC_TREEVIEW,
 		TEXT("Реестр"),
-		WS_VISIBLE | WS_CHILD | WS_BORDER | TVS_HASLINES,
+		WS_VISIBLE | WS_CHILD | WS_BORDER | TVS_HASLINES | TVS_HASBUTTONS | TVS_DISABLEDRAGDROP | TVS_TRACKSELECT,
 		5, 5,
 		400, 810,
 		hWnd,
 		(HMENU)REG_TREE_VIEW,
 		(HINSTANCE)GetWindowLong(hWnd, GWL_HINSTANCE),
 		NULL);
+
+	/*
+	HIMAGELIST hImageList;
+	hImageList = ImageList_Create(16, 16, ILC_COLOR16, 2, 10);
+	HBITMAP hBitMap;   // bitmap handler
+					   // load the picture from the resource
+	hBitMap = LoadBitmap(hInstance, MAKEINTRESOURCE(IDB_BITMAP1));
+	ImageList_Add(hImageList, hBitMap, NULL);
+	SendDlgItemMessage(hWnd, REG_TREE_VIEW, TVM_SETIMAGELIST, 0, (LPARAM)hImageList);
+	*/
+
 	return regeditTreeView;
 }
 

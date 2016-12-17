@@ -1,19 +1,14 @@
 //https://www.napishem.com/customer-248717.html
 
-#include <windows.h> 
-#include <stdlib.h> 
-#include <string.h> 
-#include <tchar.h>  
-#include <CommCtrl.h>
-#include "layout.h"
+
+#include "definitions.h"
 
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
-void setupWindow(HWND hWnd);
+void setupWindow(HWND hWnd, HINSTANCE hInstance);
 
-
-HWND regeditTreeView;
-HWND regeditListView;
-HMENU mainMenu;
+HWND regeditTreeView; //контрол для отображения дерева реестра
+HWND regeditListView; // контрол для отображения значений выбранной ветки
+HMENU mainMenu; //меню приложения
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
@@ -47,11 +42,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		return 1;
 	}
 
-	setupWindow(hWnd);
+	setupWindow(hWnd, hInstance); //создаем контролы в окне
+	loadRegistry(hWnd, regeditTreeView); //загружаем реестр 
 
 	ShowWindow(hWnd, nCmdShow);
 	UpdateWindow(hWnd);
-
+	
 	MSG msg;
 	while (GetMessage(&msg, NULL, 0, 0))
 	{
@@ -75,9 +71,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			break;
 		case WM_COMMAND: 
 		{
-			if (LOWORD(wParam) == FILE_EXIT)
+			if (LOWORD(wParam) == FILE_EXIT) //нажат пункт меню Выход
 			{
 				SendMessage(hWnd, WM_CLOSE, 0, 0);
+			}
+			if (LOWORD(wParam) == FILE_DUMP) //нажат пункт меню Создать дамп
+			{
+				dumpRegistry(); //вызов функции создания дампа
 			}
 			break;
 		}
@@ -93,9 +93,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
-void setupWindow(HWND hWnd)
+void setupWindow(HWND hWnd, HINSTANCE hInstance)
 {
-	regeditTreeView = createRegeditTreeView(hWnd);
+	regeditTreeView = createRegeditTreeView(hWnd, hInstance);
 	regeditListView = createRegeditListView(hWnd);
 	mainMenu = createMenu(hWnd);
 }
