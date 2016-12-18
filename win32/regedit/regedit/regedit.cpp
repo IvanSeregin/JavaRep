@@ -2,88 +2,184 @@
 #include <stdio.h>
 #include <string>
 
-#define MAX_KEY_LENGTH 255
-#define MAX_VALUE_NAME 16383
 
-HKEY dumpKey(HKEY hKey, TCHAR path[]);
+
+HKEY dumpCatalog(HKEY hRootKey, HKEY hKey, TCHAR path[], HANDLE hFile);
+HKEY determineHKEY(TCHAR path[MAX_KEY_LENGTH]);
+//HKEY loadKey(HWND hWnd, HKEY hRootKey, HKEY hKey, TCHAR path[], HTREEITEM Parent);
 
 bool dumpRegistry()
 {
 	HKEY key;
-	TCHAR  path[] = _T("AppEvents");
-
-	if (RegOpenKeyEx(HKEY_CURRENT_USER,	path, 0, KEY_READ, &key) == ERROR_SUCCESS)
+	TCHAR fileName[MAX_KEY_LENGTH] = _T("");
+	PWSTR fName;
+	//Получаем путь до рабочего стола текущего пользователя
+	//и генерируем имя файла для сохранения реестра
+	if (SHGetKnownFolderPath(FOLDERID_Desktop, KF_FLAG_DEFAULT, NULL, &fName) == S_OK)
 	{
-		dumpKey(key, path);
+		wcscpy(fileName, fName);
+		wcscat_s(fileName, _T("\\regedit.txt"));
+	}
+	else
+		return false;
+	
+	//Пробуем открыть полученный файл
+	HANDLE hFile = CreateFile(fileName, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+	//wfstream out("events.txt", wios::out);
+	
+	if (!hFile) return false;
+	
+	//Если файл был открыт удачно, открываем на чтение первую ветку реестра 
+	//и вызываем функцию сохранения реестра dumpKey(). 
+	//Данная функция является рекурсивной!!!
+	TCHAR  path[MAX_KEY_LENGTH] = _T("");
+	WriteFile(hFile, "[HKEY_CLASSES_ROOT]\n", strlen("[HKEY_CLASSES_ROOT]\n"), NULL, NULL);
+	if (RegOpenKeyEx(HKCR,	path, 0, KEY_READ, &key) == ERROR_SUCCESS)
+	{
+		dumpCatalog(key, key, path, hFile);
+		RegCloseKey(key);
+	}
+	WriteFile(hFile, "[HKEY_CURRENT_USER]\n", strlen("[HKEY_CURRENT_USER]\n"), NULL, NULL);
+	if (RegOpenKeyEx(HKCU, path, 0, KEY_READ, &key) == ERROR_SUCCESS)
+	{
+		dumpCatalog(key, key, path, hFile);
+		RegCloseKey(key);
+	}
+	WriteFile(hFile, "[HKEY_LOCAL_MACHINE]\n", strlen("[HKEY_LOCAL_MACHINE]\n"), NULL, NULL);
+	if (RegOpenKeyEx(HKLM, path, 0, KEY_READ, &key) == ERROR_SUCCESS)
+	{
+		dumpCatalog(key, key, path, hFile);
+		RegCloseKey(key);
+	}
+	WriteFile(hFile, "[HKEY_USERS]\n", strlen("[HKEY_USERS]\n"), NULL, NULL);
+	if (RegOpenKeyEx(HKU, path, 0, KEY_READ, &key) == ERROR_SUCCESS)
+	{
+		dumpCatalog(key, key, path, hFile);
+		RegCloseKey(key);
+	}
+	WriteFile(hFile, "[HKEY_CURRENT_CONFIG]\n", strlen("[HKEY_CURRENT_CONFIG]\n"), NULL, NULL);
+	if (RegOpenKeyEx(HKCC, path, 0, KEY_READ, &key) == ERROR_SUCCESS)
+	{
+		dumpCatalog(key, key, path, hFile);
 		RegCloseKey(key);
 	}
 
+	CloseHandle(hFile);
 	return true;
 }
 
-HKEY dumpKey(HKEY hKey, TCHAR path[])
+HKEY dumpCatalog(HKEY hRootKey, HKEY hKey, TCHAR path[], HANDLE hFile)
 {
-
-	TCHAR    achKey[MAX_KEY_LENGTH];   // buffer for subkey name
-	DWORD    cbName;                   // size of name string 
-	TCHAR    achClass[MAX_PATH] = TEXT("");  // buffer for class name 
-	DWORD    cchClassName = MAX_PATH;  // size of class string 
-	DWORD    cSubKeys = 0;               // number of subkeys 
-	DWORD    cbMaxSubKey;              // longest subkey size 
-	DWORD    cchMaxClass;              // longest class string 
-	DWORD    cValues;              // number of values for key 
-	DWORD    cchMaxValue;          // longest value name 
-	DWORD    cbMaxValueData;       // longest value data 
-	DWORD    cbSecurityDescriptor; // size of security descriptor 
-	FILETIME ftLastWriteTime;      // last write time 
+	TCHAR    achKey[MAX_KEY_LENGTH];   // буфер для подкаталогов
+	DWORD    cbName;                  
+	TCHAR    achClass[MAX_PATH] = TEXT("");  
+	DWORD    cchClassName = MAX_PATH;  
+	DWORD    cSubKeys = 0;         
+	DWORD    cbMaxSubKey;          
+	DWORD    cchMaxClass;         
+	DWORD    cValues;             
+	DWORD    cchMaxValue;         
+	DWORD    cbMaxValueData;      
+	DWORD    cbSecurityDescriptor;
+	FILETIME ftLastWriteTime;     
 
 	DWORD i, retCode;
 
-	TCHAR  achValue[MAX_VALUE_NAME];
 	DWORD cchValue = MAX_VALUE_NAME;
 
-	// Get the class name and the value count. 
-	retCode = RegQueryInfoKey(
-		hKey,                    // key handle 
-		achClass,                // buffer for class name 
-		&cchClassName,           // size of class string 
-		NULL,                    // reserved 
-		&cSubKeys,               // number of subkeys 
-		&cbMaxSubKey,            // longest subkey size 
-		&cchMaxClass,            // longest class string 
-		&cValues,                // number of values for this key 
-		&cchMaxValue,            // longest value name 
-		&cbMaxValueData,         // longest value data 
-		&cbSecurityDescriptor,   // security descriptor 
-		&ftLastWriteTime);       // last write time 
+	// Получаем информацию о текущей ветке
+	retCode = RegQueryInfoKey(hKey, achClass, &cchClassName, NULL,&cSubKeys, &cbMaxSubKey, &cchMaxClass, &cValues, &cchMaxValue, &cbMaxValueData, &cbSecurityDescriptor, &ftLastWriteTime);       
 
-	 // Enumerate the subkeys, until RegEnumKeyEx fails.
+	 // cSubKeys - количество подветок текущей ветки
 	if (cSubKeys)
 	{
-		for (i = 0; i<cSubKeys; i++)
+		//---------------------------------------------ПОЛУЧЕНИЕ НАЗВАНИЯ ВЕТКИ РЕЕСТРА ------------------
+		//Перебираем все подветки
+ 		for (i = 0; i<cSubKeys; i++)
 		{
-			TCHAR tmpPath[] = _T("");
-			wcscat(tmpPath, path);
+			TCHAR tmpPath[MAX_KEY_LENGTH] = _T(""); //для временного сохранения пути до подветки
+			wcscat_s(tmpPath, path); //запоминаем текущую подветку
 			cbName = MAX_KEY_LENGTH;
-			retCode = RegEnumKeyEx(hKey, i,
-				achKey,
-				&cbName,
-				NULL,
-				NULL,
-				NULL,
-				&ftLastWriteTime);
+			//Получаем список подветок текущей ветки, которая указана в hKey
+			retCode = RegEnumKeyEx(hKey, i,	achKey,	&cbName, NULL, NULL, NULL, &ftLastWriteTime);
+			//Если информация получена, то производим перебор все подветок
 			if (retCode == ERROR_SUCCESS)
 			{
-				_tprintf(TEXT("(%d) %s\n"), i + 1, achKey);
 
-				wcscat(tmpPath, _T("\\"));
-				wcscat(tmpPath, achKey);
+				if (wcslen(path)) wcscat_s(tmpPath, _T("\\"));
+				wcscat_s(tmpPath, achKey);
 
 				HKEY tmpKey = hKey;
-				if (RegOpenKeyEx(HKEY_CURRENT_USER, tmpPath, 0, KEY_READ, &tmpKey) == ERROR_SUCCESS)
+				//Открываем текущий подкаталог
+				if (RegOpenKeyEx(hRootKey, tmpPath, 0, KEY_READ, &tmpKey) == ERROR_SUCCESS)
 				{
-					dumpKey(tmpKey, tmpPath);
+					//Если все ок, то записываем о нем информацию в файл.
+					char *ch = new char[MAX_KEY_LENGTH];
+					wcstombs(ch, tmpPath, MAX_KEY_LENGTH);
+
+					WriteFile(hFile, "[", strlen("["), NULL, NULL);
+					WriteFile(hFile, ch, strlen(ch), NULL, NULL);
+					WriteFile(hFile, "]\n", strlen("]\n"), NULL, NULL);
+					
+					//---------------------------------------ПОЛУЧЕНИЕ КЛЮЧЕЙ В ТЕКУЩЕЙ ВЕТКЕ
+					//Далее читаем все ключи и их значения из текущей ветки реесра
+					LONG lResult;
+					DWORD j = 0;
+					do
+					{
+						TCHAR Name[MAX_KEY_LENGTH]; //имя ключа
+						TCHAR Value[MAX_KEY_LENGTH]; //значение ключа
+						DWORD cName = 4096;
+						DWORD cValue = 4096;
+						DWORD type =  0;
+
+						lResult = RegEnumValue(tmpKey, j, Name, &(cName = MAX_KEY_LENGTH), NULL, &type, (PBYTE)Value, &(cValue = MAX_KEY_LENGTH));
+						if (lResult == ERROR_SUCCESS)
+						{
+							//если есть ключ - пишем его в файл
+							char *vl = new char[MAX_KEY_LENGTH];
+							//memset(vl, 0x0, sizeof(vl));
+							if (type == REG_DWORD) // значение ключа типа REG_DWORD
+							{							
+								_ultoa(*Value, vl, 16);
+							}
+							else if (type == REG_BINARY) //значение ключа типа REG_BINARY
+							{
+								ultoa(*Value, vl, 16);
+							}
+							else //значение ключа текстовое
+							{
+								wcstombs(vl, Value, MAX_KEY_LENGTH);
+							}
+
+							//Конвертируем TCHAR в char для вывода в файл
+							char *nm = new char[MAX_KEY_LENGTH];
+							wcstombs(nm, Name, MAX_KEY_LENGTH);
+
+							//Записываем имя параметра в файл
+							if (strlen(nm) == 0)
+								WriteFile(hFile, "@", strlen("@"), NULL, NULL);
+							else
+								WriteFile(hFile, nm, strlen(nm), NULL, NULL);
+
+							//Записываем значение параметра в файл
+							WriteFile(hFile, "=", strlen("="), NULL, NULL);
+							WriteFile(hFile, vl, strlen(vl), NULL, NULL);
+							WriteFile(hFile, "\n", strlen("\n"), NULL, NULL);
+
+							//Прибираемся в памяти
+							delete[] nm;
+							delete[] vl;
+						}
+						j++; //Переходим к следующему параметру
+					} while (lResult != ERROR_NO_MORE_ITEMS); //Если параметров больше нет - выходим
+					///---------------------------------------ПОЛУЧЕНИЕ КЛЮЧЕЙ В ТЕКУЩЕЙ ВЕТКЕ ЗАКОНЧЕНО
+					//Прибираемся в памяти
+					delete[] ch;
+					//Вызываем текущую функцию повторно, но уже для поиска подкаталогов текущего каталого
+					dumpCatalog(hRootKey, tmpKey, tmpPath, hFile);
 					RegCloseKey(tmpKey);
+					WriteFile(hFile, "\n", strlen("\n"), NULL, NULL);
 				}
 			}
 		}
@@ -92,54 +188,191 @@ HKEY dumpKey(HKEY hKey, TCHAR path[])
 	return NULL;
 }
 
-bool loadRegistry(HWND hWnd, HWND regeditTreeView)
+bool loadRegistry(HWND hWnd, HWND regeditTreeView, HTREEITEM *MyPC)
 {
-	/*
 	TV_INSERTSTRUCT tvinsert;
-	HTREEITEM Parent;
-	HTREEITEM Before;
-	HTREEITEM Root;
+	HTREEITEM hkeyItem;
 
 	tvinsert.hParent = NULL;
 	tvinsert.hInsertAfter = TVI_ROOT;
-	tvinsert.item.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE;
+	tvinsert.item.mask = TVIF_TEXT | TVIF_CHILDREN;
 	tvinsert.item.pszText = L"Мой компьютер";
-	Parent = (HTREEITEM)SendDlgItemMessage(hWnd, REG_TREE_VIEW, TVM_INSERTITEM, 0, (LPARAM)&tvinsert);
+	*MyPC = (HTREEITEM)SendDlgItemMessage(hWnd, REG_TREE_VIEW, TVM_INSERTITEM, 0, (LPARAM)&tvinsert);
 
-	tvinsert.hParent = Parent;          // create a child to our parent ;-)
-	tvinsert.hInsertAfter = TVI_LAST;   // put it under [ last item ]
-	tvinsert.item.pszText = L"Child 1";  // name it whatever u want
-	Parent = (HTREEITEM)SendDlgItemMessage(hWnd, REG_TREE_VIEW, TVM_INSERTITEM, 0, (LPARAM)&tvinsert);
-
-	Root = Parent;
-	Before = Parent;       // handle of the before root
-	tvinsert.hParent = Parent; // handle of the above data
-	tvinsert.hInsertAfter = TVI_LAST;  // below parent
-	tvinsert.item.pszText = L"Child 1";
-	// draw it, and save the parent for more child making.
-	Parent = (HTREEITEM)SendDlgItemMessage(hWnd, REG_TREE_VIEW, TVM_INSERTITEM, 0, (LPARAM)&tvinsert);
-
-	tvinsert.hParent = Parent;
-	tvinsert.item.pszText = L"Child of Child1";
-	Parent = (HTREEITEM)SendDlgItemMessage(hWnd, REG_TREE_VIEW, TVM_INSERTITEM, 0, (LPARAM)&tvinsert);
-
-	tvinsert.hParent = Parent;
+	tvinsert.hParent = *MyPC;
 	tvinsert.hInsertAfter = TVI_LAST;
-	tvinsert.item.pszText = L"Double Click Me!";
-	tvinsert.item.mask = TVIF_TEXT;
-	SendDlgItemMessage(hWnd, REG_TREE_VIEW, TVM_INSERTITEM, 0, (LPARAM)&tvinsert);
+	tvinsert.item.pszText = L"HKEY_CLASSES_ROOT";
+	hkeyItem = (HTREEITEM)SendDlgItemMessage(hWnd, REG_TREE_VIEW, TVM_INSERTITEM, 0, (LPARAM)&tvinsert);
 
-	tvinsert.hParent = Before;         // handle of the above data
-	tvinsert.hInsertAfter = TVI_LAST;  // below parent
-	tvinsert.item.pszText = L"Child 2";
-	Parent = (HTREEITEM)SendDlgItemMessage(hWnd, REG_TREE_VIEW, TVM_INSERTITEM, 0, (LPARAM)&tvinsert);
+	tvinsert.item.pszText = L"HKEY_CURRENT_USER";
+	hkeyItem = (HTREEITEM)SendDlgItemMessage(hWnd, REG_TREE_VIEW, TVM_INSERTITEM, 0, (LPARAM)&tvinsert);
 
-	tvinsert.hParent = NULL; // top most level no need handle
-	tvinsert.hInsertAfter = TVI_LAST; // work as root level
-	tvinsert.item.pszText = L"Parent2";
-	Parent = (HTREEITEM)SendDlgItemMessage(hWnd, REG_TREE_VIEW, TVM_INSERTITEM, 0, (LPARAM)&tvinsert);
-	*/
+	tvinsert.item.pszText = L"HKEY_LOCAL_MACHINE";
+	hkeyItem = (HTREEITEM)SendDlgItemMessage(hWnd, REG_TREE_VIEW, TVM_INSERTITEM, 0, (LPARAM)&tvinsert);
+
+	tvinsert.item.pszText = L"HKEY_USERS";
+	hkeyItem = (HTREEITEM)SendDlgItemMessage(hWnd, REG_TREE_VIEW, TVM_INSERTITEM, 0, (LPARAM)&tvinsert);
+
+	tvinsert.item.pszText = L"HKEY_CURRENT_CONFIG";
+	hkeyItem = (HTREEITEM)SendDlgItemMessage(hWnd, REG_TREE_VIEW, TVM_INSERTITEM, 0, (LPARAM)&tvinsert);
+
+	TreeView_Expand(regeditTreeView, *MyPC, TVE_EXPAND);
+
 	return true;
 }
 
+void updateSubCatalogs(HWND hTreeView, TV_ITEMW Parent, TCHAR fullPath[MAX_KEY_LENGTH]) //сканирует и добавляет каталоги к выбранному каталогу
+{
+	TCHAR    achKey[MAX_KEY_LENGTH];   // буфер для подкаталогов
+	DWORD    cbName;
+	TCHAR    achClass[MAX_PATH] = TEXT("");
+	DWORD    cchClassName = MAX_PATH;
+	DWORD    cSubKeys = 0;
+	DWORD    cbMaxSubKey;
+	DWORD    cchMaxClass;
+	DWORD    cValues;
+	DWORD    cchMaxValue;
+	DWORD    cbMaxValueData;
+	DWORD    cbSecurityDescriptor;
+	FILETIME ftLastWriteTime;
 
+	DWORD i, retCode;
+	DWORD cchValue = MAX_VALUE_NAME;
+	HKEY key;
+
+	HKEY hRootKey = determineHKEY(fullPath);
+	if (hRootKey == NULL) return;
+
+	
+	if (RegOpenKeyEx(hRootKey, fullPath, 0, KEY_READ, &key) == ERROR_SUCCESS)
+	{
+
+	}
+	/**/
+	// Получаем информацию о текущей ветке
+	retCode = RegQueryInfoKey(hKey, achClass, &cchClassName, NULL, &cSubKeys, &cbMaxSubKey, &cchMaxClass, &cValues, &cchMaxValue, &cbMaxValueData, &cbSecurityDescriptor, &ftLastWriteTime);
+
+	// cSubKeys - количество подветок текущей ветки
+	if (cSubKeys)
+	{
+		//---------------------------------------------ПОЛУЧЕНИЕ НАЗВАНИЯ ВЕТКИ РЕЕСТРА ------------------
+		//Перебираем все подветки
+		for (i = 0; i < cSubKeys; i++)
+		{
+			cbName = MAX_KEY_LENGTH;
+			//Получаем список подветок текущей ветки, которая указана в hKey
+			retCode = RegEnumKeyEx(hKey, i, achKey, &cbName, NULL, NULL, NULL, &ftLastWriteTime);
+			//Если информация получена, то производим перебор все подветок
+			if (retCode == ERROR_SUCCESS)
+			{
+				HKEY tmpKey = hKey;
+				//Открываем текущий подкаталог
+				if (RegOpenKeyEx(hRootKey, tmpPath, 0, KEY_READ, &tmpKey) == ERROR_SUCCESS)
+				{
+					//Создание элемента в tree view
+					TV_INSERTSTRUCT tvinsert;
+					HTREEITEM tmpParent = Parent;
+					tvinsert.hParent = tmpParent;
+					tvinsert.hInsertAfter = TVI_LAST;
+					tvinsert.item.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE;
+					tvinsert.item.pszText = achKey;
+					tmpParent = (HTREEITEM)SendDlgItemMessage(hWnd, REG_TREE_VIEW, TVM_INSERTITEM, 0, (LPARAM)&tvinsert);
+					//Вызываем текущую функцию повторно, но уже для поиска подкаталогов текущего каталого
+					RegCloseKey(tmpKey);
+				}
+			}
+		}
+	}
+	*/
+}
+
+HKEY determineHKEY(TCHAR path[MAX_KEY_LENGTH])
+{
+	if (wcsstr(path, _T("HKEY_CLASSES_ROOT")) != NULL)
+	{	
+		return HKCR;
+	}
+	if (wcsstr(path, _T("HKEY_CURRENT_USER")) != NULL)
+	{
+		return HKCU;
+	}
+	if (wcsstr(path, _T("HKEY_LOCAL_MACHINE")) != NULL)
+	{
+		return HKLM;
+	}
+	if (wcsstr(path, _T("HKEY_USERS")) != NULL)
+	{
+		return HKU;
+	}
+	if (wcsstr(path, _T("HKEY_CURRENT_CONFIG")) != NULL)
+	{
+		return HKCC;
+	}
+	else 
+		return NULL;
+}
+
+/*
+HKEY loadKey(HWND hWnd, HKEY hRootKey, HKEY hKey, TCHAR path[], HTREEITEM Parent)
+{
+	TCHAR    achKey[MAX_KEY_LENGTH];   // буфер для подкаталогов
+	DWORD    cbName;
+	TCHAR    achClass[MAX_PATH] = TEXT("");
+	DWORD    cchClassName = MAX_PATH;
+	DWORD    cSubKeys = 0;
+	DWORD    cbMaxSubKey;
+	DWORD    cchMaxClass;
+	DWORD    cValues;
+	DWORD    cchMaxValue;
+	DWORD    cbMaxValueData;
+	DWORD    cbSecurityDescriptor;
+	FILETIME ftLastWriteTime;
+
+	DWORD i, retCode;
+
+	DWORD cchValue = MAX_VALUE_NAME;
+
+	// Получаем информацию о текущей ветке
+	retCode = RegQueryInfoKey(hKey, achClass, &cchClassName, NULL, &cSubKeys, &cbMaxSubKey, &cchMaxClass, &cValues, &cchMaxValue, &cbMaxValueData, &cbSecurityDescriptor, &ftLastWriteTime);
+
+	// cSubKeys - количество подветок текущей ветки
+	if (cSubKeys)
+	{
+		//---------------------------------------------ПОЛУЧЕНИЕ НАЗВАНИЯ ВЕТКИ РЕЕСТРА ------------------
+		//Перебираем все подветки
+		for (i = 0; i < cSubKeys; i++)
+		{
+			TCHAR tmpPath[MAX_KEY_LENGTH] = _T(""); //для временного сохранения пути до подветки
+			wcscat_s(tmpPath, path); //запоминаем текущую подветку
+			cbName = MAX_KEY_LENGTH;
+			//Получаем список подветок текущей ветки, которая указана в hKey
+			retCode = RegEnumKeyEx(hKey, i, achKey, &cbName, NULL, NULL, NULL, &ftLastWriteTime);
+			//Если информация получена, то производим перебор все подветок
+			if (retCode == ERROR_SUCCESS)
+			{
+
+				if (wcslen(path)) wcscat_s(tmpPath, _T("\\"));
+				wcscat_s(tmpPath, achKey);
+
+				HKEY tmpKey = hKey;
+				//Открываем текущий подкаталог
+				if (RegOpenKeyEx(hRootKey, tmpPath, 0, KEY_READ, &tmpKey) == ERROR_SUCCESS)
+				{
+					//Создание элемента в tree view
+					TV_INSERTSTRUCT tvinsert;
+					HTREEITEM tmpParent = Parent;
+					tvinsert.hParent = tmpParent;
+					tvinsert.hInsertAfter = TVI_LAST;
+					tvinsert.item.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE;
+					tvinsert.item.pszText = achKey;
+					tmpParent = (HTREEITEM)SendDlgItemMessage(hWnd, REG_TREE_VIEW, TVM_INSERTITEM, 0, (LPARAM)&tvinsert);
+					//Вызываем текущую функцию повторно, но уже для поиска подкаталогов текущего каталого
+					loadKey(hWnd, hRootKey, tmpKey, tmpPath, tmpParent);
+					RegCloseKey(tmpKey);
+				}
+			}
+		}
+	}
+	return NULL;
+}
+*/

@@ -9,9 +9,11 @@ void setupWindow(HWND hWnd, HINSTANCE hInstance);
 HWND regeditTreeView; //контрол для отображения дерева реестра
 HWND regeditListView; // контрол для отображения значений выбранной ветки
 HMENU mainMenu; //меню приложения
+HTREEITEM *root; //корневой элемент для TreeView
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
+	setlocale(LC_CTYPE, "Russian");
 	WNDCLASSEX wcex;
 	static TCHAR szWindowClass[] = _T("regedit");
 	static TCHAR szTitle[] = _T("regedit");
@@ -43,7 +45,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	}
 
 	setupWindow(hWnd, hInstance); //создаем контролы в окне
-	loadRegistry(hWnd, regeditTreeView); //загружаем реестр 
+	root = new HTREEITEM;
+	loadRegistry(hWnd, regeditTreeView, root); //загружаем реестр 
 
 	ShowWindow(hWnd, nCmdShow);
 	UpdateWindow(hWnd);
@@ -84,6 +87,35 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		case WM_CLOSE:
 		{
 			DestroyWindow(hWnd);
+			break;
+		}
+		case WM_NOTIFY:
+		{
+			switch (LOWORD(wParam))
+			{
+			case REG_TREE_VIEW:
+				if (((LPNMHDR)lParam)->code == TVN_SELCHANGED)
+				{
+					HTREEITEM hClicked = ((NMTREEVIEW*)lParam)->itemNew.hItem;
+					TCHAR regPath[MAX_KEY_LENGTH];
+					if (hClicked != *root)
+					{
+						GetFullPath(((NMTREEVIEW*)lParam)->itemNew.hItem, root, regeditTreeView, regPath);
+						//ListDirectory(g_hListView, activePath);
+					}
+					//MessageBox(hWnd, regPath, L"OK", MB_OK);
+
+				}
+				else if (((LPNMHDR)lParam)->code == TVN_ITEMEXPANDING)
+				{
+					TCHAR fullPath[MAX_KEY_LENGTH];
+					if (((NMTREEVIEW*)lParam)->action == TVE_EXPAND)
+					{
+						GetFullPath(((NMTREEVIEW*)lParam)->itemNew.hItem, root, regeditTreeView, fullPath);
+						updateSubCatalogs(regeditTreeView, ((NMTREEVIEW*)lParam)->itemNew.hItem, fullPath);
+					}
+				}
+			}
 			break;
 		}
 		default:
