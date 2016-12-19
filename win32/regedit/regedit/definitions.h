@@ -42,5 +42,6 @@ bool loadRegistry(HWND hWnd, HWND regeditTreeView, HTREEITEM *root); //отображае
 bool dumpRegistry(); //создает дамп реестра в файл
 void GetFullPath(HTREEITEM hItem, HTREEITEM *root, HWND hTreeView, LPWSTR buf); //получае полный путь до выбранного каталога
 void updateSubCatalogs(HWND hTreeView, TV_ITEMW Parent, TCHAR fullPath[MAX_KEY_LENGTH]); //сканирует и добавляет каталоги к выбранному каталогу
-
+void removeHKRoot(TCHAR fullPath[MAX_KEY_LENGTH]);//функция удаляет из пути название корневой ветки реестра
+void clearBranch(HWND hTreeView, HTREEITEM hItem);
 #endif //_LAYOUT_H

@@ -190,6 +190,7 @@ HKEY dumpCatalog(HKEY hRootKey, HKEY hKey, TCHAR path[], HANDLE hFile)
 
 bool loadRegistry(HWND hWnd, HWND regeditTreeView, HTREEITEM *MyPC)
 {
+	
 	TV_INSERTSTRUCT tvinsert;
 	HTREEITEM hkeyItem;
 
@@ -198,7 +199,7 @@ bool loadRegistry(HWND hWnd, HWND regeditTreeView, HTREEITEM *MyPC)
 	tvinsert.item.mask = TVIF_TEXT | TVIF_CHILDREN;
 	tvinsert.item.pszText = L"Мой компьютер";
 	*MyPC = (HTREEITEM)SendDlgItemMessage(hWnd, REG_TREE_VIEW, TVM_INSERTITEM, 0, (LPARAM)&tvinsert);
-
+	
 	tvinsert.hParent = *MyPC;
 	tvinsert.hInsertAfter = TVI_LAST;
 	tvinsert.item.pszText = L"HKEY_CLASSES_ROOT";
@@ -217,11 +218,11 @@ bool loadRegistry(HWND hWnd, HWND regeditTreeView, HTREEITEM *MyPC)
 	hkeyItem = (HTREEITEM)SendDlgItemMessage(hWnd, REG_TREE_VIEW, TVM_INSERTITEM, 0, (LPARAM)&tvinsert);
 
 	TreeView_Expand(regeditTreeView, *MyPC, TVE_EXPAND);
-
+	
 	return true;
 }
 
-void updateSubCatalogs(HWND hTreeView, TV_ITEMW Parent, TCHAR fullPath[MAX_KEY_LENGTH]) //сканирует и добавляет каталоги к выбранному каталогу
+void updateSubCatalogs(HWND hWnd, TV_ITEMW Parent, TCHAR fullPath[MAX_KEY_LENGTH]) //сканирует и добавляет каталоги к выбранному каталогу
 {
 	TCHAR    achKey[MAX_KEY_LENGTH];   // буфер для подкаталогов
 	DWORD    cbName;
@@ -243,12 +244,36 @@ void updateSubCatalogs(HWND hTreeView, TV_ITEMW Parent, TCHAR fullPath[MAX_KEY_L
 	HKEY hRootKey = determineHKEY(fullPath);
 	if (hRootKey == NULL) return;
 
-	
+	removeHKRoot(fullPath);
+
 	if (RegOpenKeyEx(hRootKey, fullPath, 0, KEY_READ, &key) == ERROR_SUCCESS)
 	{
-
+		retCode = RegQueryInfoKey(key, achClass, &cchClassName, NULL, &cSubKeys, &cbMaxSubKey, &cchMaxClass, &cValues, &cchMaxValue, &cbMaxValueData, &cbSecurityDescriptor, &ftLastWriteTime);
+		for (i = 0; i < cSubKeys; i++)
+		{
+			cbName = MAX_KEY_LENGTH;
+			//Получаем список подветок текущей ветки, которая указана в hKey
+			retCode = RegEnumKeyEx(key, i, achKey, &cbName, NULL, NULL, NULL, &ftLastWriteTime);
+			//Если информация получена, то производим перебор все подветок
+			if (retCode == ERROR_SUCCESS)
+			{
+					//Создание элемента в tree view
+					TV_INSERTSTRUCT tvinsert;
+					Parent.pszText;
+					tvinsert.hParent = Parent.hItem;
+					tvinsert.hInsertAfter = TVI_LAST;
+					tvinsert.item.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE | TVIF_CHILDREN;
+					tvinsert.item.pszText = achKey;
+					(HTREEITEM)SendDlgItemMessage(hWnd, REG_TREE_VIEW, TVM_INSERTITEM, 0, (LPARAM)&tvinsert);
+			}
+		}
+		RegCloseKey(key);
 	}
-	/**/
+	else
+	{
+		return;
+	}
+	/*
 	// Получаем информацию о текущей ветке
 	retCode = RegQueryInfoKey(hKey, achClass, &cchClassName, NULL, &cSubKeys, &cbMaxSubKey, &cchMaxClass, &cValues, &cchMaxValue, &cbMaxValueData, &cbSecurityDescriptor, &ftLastWriteTime);
 

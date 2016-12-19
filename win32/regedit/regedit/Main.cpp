@@ -93,26 +93,34 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		{
 			switch (LOWORD(wParam))
 			{
-			case REG_TREE_VIEW:
-				if (((LPNMHDR)lParam)->code == TVN_SELCHANGED)
+			case REG_TREE_VIEW: // события связанные с контролом TreeView
+				if (((LPNMHDR)lParam)->code == TVN_SELCHANGED)//событие на выделение пункта в списке
 				{
-					HTREEITEM hClicked = ((NMTREEVIEW*)lParam)->itemNew.hItem;
-					TCHAR regPath[MAX_KEY_LENGTH];
-					if (hClicked != *root)
-					{
-						GetFullPath(((NMTREEVIEW*)lParam)->itemNew.hItem, root, regeditTreeView, regPath);
-						//ListDirectory(g_hListView, activePath);
-					}
-					//MessageBox(hWnd, regPath, L"OK", MB_OK);
-
-				}
-				else if (((LPNMHDR)lParam)->code == TVN_ITEMEXPANDING)
-				{
-					TCHAR fullPath[MAX_KEY_LENGTH];
-					if (((NMTREEVIEW*)lParam)->action == TVE_EXPAND)
+					HTREEITEM hClicked = ((NMTREEVIEW*)lParam)->itemNew.hItem; //получаем указатель на выделенную строку
+					TCHAR fullPath[MAX_KEY_LENGTH]=_T("");
+					/*Если выделена строка отличная от корня
+					то находим полный путь в реестре до этого каталога
+					и перечисляем все ключи и их значения в контроле ListView
+					*/
+					if (hClicked != *root) 
 					{
 						GetFullPath(((NMTREEVIEW*)lParam)->itemNew.hItem, root, regeditTreeView, fullPath);
-						updateSubCatalogs(regeditTreeView, ((NMTREEVIEW*)lParam)->itemNew.hItem, fullPath);
+						//ListDirectory(g_hListView, activePath);
+					}
+
+				}
+				else if (((LPNMHDR)lParam)->code == TVN_ITEMEXPANDING) //событие на разворачивание пункта в списке
+				{
+					HTREEITEM hClicked = ((NMTREEVIEW*)lParam)->itemNew.hItem;
+					TCHAR fullPath[MAX_KEY_LENGTH] = _T("");
+					if (((NMTREEVIEW*)lParam)->action == TVE_EXPAND)
+					{
+						if (hClicked != *root)
+						{
+							GetFullPath(((NMTREEVIEW*)lParam)->itemNew.hItem, root, regeditTreeView, fullPath);
+							clearBranch(regeditTreeView, ((NMTREEVIEW*)lParam)->itemNew.hItem);
+							updateSubCatalogs(hWnd, ((NMTREEVIEW*)lParam)->itemNew, fullPath);
+						}
 					}
 				}
 			}

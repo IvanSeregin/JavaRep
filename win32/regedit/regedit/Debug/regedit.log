@@ -1,21 +1,21 @@
 ﻿  regedit.cpp
 d:\git\javarep\win32\regedit\regedit\regedit.cpp(20): warning C4996: 'wcscpy': This function or variable may be unsafe. Consider using wcscpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-  c:\program files\windows kits\10\include\10.0.10240.0\ucrt\corecrt_wstring.h(121): note:  см. объявление "wcscpy"
+  c:\program files\windows kits\10\include\10.0.10240.0\ucrt\corecrt_wstring.h(121): note: see declaration of 'wcscpy'
 d:\git\javarep\win32\regedit\regedit\regedit.cpp(118): warning C4996: 'wcstombs': This function or variable may be unsafe. Consider using wcstombs_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-  c:\program files\windows kits\10\include\10.0.10240.0\ucrt\stdlib.h(1008): note:  см. объявление "wcstombs"
+  c:\program files\windows kits\10\include\10.0.10240.0\ucrt\stdlib.h(1008): note: see declaration of 'wcstombs'
 d:\git\javarep\win32\regedit\regedit\regedit.cpp(144): warning C4996: '_ultoa': This function or variable may be unsafe. Consider using _ultoa_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-  c:\program files\windows kits\10\include\10.0.10240.0\ucrt\stdlib.h(683): note:  см. объявление "_ultoa"
+  c:\program files\windows kits\10\include\10.0.10240.0\ucrt\stdlib.h(683): note: see declaration of '_ultoa'
 d:\git\javarep\win32\regedit\regedit\regedit.cpp(148): warning C4996: 'ultoa': The POSIX name for this item is deprecated. Instead, use the ISO C and C++ conformant name: _ultoa. See online help for details.
-  c:\program files\windows kits\10\include\10.0.10240.0\ucrt\stdlib.h(1338): note:  см. объявление "ultoa"
+  c:\program files\windows kits\10\include\10.0.10240.0\ucrt\stdlib.h(1338): note: see declaration of 'ultoa'
 d:\git\javarep\win32\regedit\regedit\regedit.cpp(152): warning C4996: 'wcstombs': This function or variable may be unsafe. Consider using wcstombs_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-  c:\program files\windows kits\10\include\10.0.10240.0\ucrt\stdlib.h(1008): note:  см. объявление "wcstombs"
+  c:\program files\windows kits\10\include\10.0.10240.0\ucrt\stdlib.h(1008): note: see declaration of 'wcstombs'
 d:\git\javarep\win32\regedit\regedit\regedit.cpp(157): warning C4996: 'wcstombs': This function or variable may be unsafe. Consider using wcstombs_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-  c:\program files\windows kits\10\include\10.0.10240.0\ucrt\stdlib.h(1008): note:  см. объявление "wcstombs"
+  c:\program files\windows kits\10\include\10.0.10240.0\ucrt\stdlib.h(1008): note: see declaration of 'wcstombs'
   helpers.cpp
-d:\git\javarep\win32\regedit\regedit\helpers.cpp(7): warning C4101: tmpoverlap: неиспользованная локальная переменная
-d:\git\javarep\win32\regedit\regedit\helpers.cpp(8): warning C4101: tmphItem: неиспользованная локальная переменная
-  Main.cpp
-d:\git\javarep\win32\regedit\regedit\main.cpp(29): warning C4302: приведение типов: усечение из "LPWSTR" в "WORD"
-d:\git\javarep\win32\regedit\regedit\main.cpp(34): warning C4302: приведение типов: усечение из "LPWSTR" в "WORD"
-  Создание кода...
+d:\git\javarep\win32\regedit\regedit\helpers.cpp(29): warning C4996: 'wcscpy': This function or variable may be unsafe. Consider using wcscpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files\windows kits\10\include\10.0.10240.0\ucrt\corecrt_wstring.h(121): note: see declaration of 'wcscpy'
+d:\git\javarep\win32\regedit\regedit\helpers.cpp(11): warning C4101: 'tmphItem': unreferenced local variable
+d:\git\javarep\win32\regedit\regedit\helpers.cpp(65): warning C4996: 'wcscpy': This function or variable may be unsafe. Consider using wcscpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files\windows kits\10\include\10.0.10240.0\ucrt\corecrt_wstring.h(121): note: see declaration of 'wcscpy'
+  Generating Code...
   regedit.vcxproj -> D:\git\JavaRep\win32\regedit\Debug\regedit.exe
