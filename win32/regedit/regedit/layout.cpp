@@ -8,6 +8,8 @@ HMENU createMenu(HWND hWnd)
 	HMENU PopMenuFind = CreatePopupMenu();
 	HMENU PopMenuEdit = CreatePopupMenu();
 	HMENU PopMenuEditObject = CreatePopupMenu();
+	HMENU PopMenuAddObject = CreatePopupMenu();
+	HMENU PopMenuDelObject = CreatePopupMenu();
 
 	AppendMenu(mainMenu, MF_STRING | MF_POPUP, (UINT)PopMenuFile, L"&Файл");
 	AppendMenu(PopMenuFile, MF_STRING, FILE_DUMP, L"Создать дамп");
@@ -19,10 +21,14 @@ HMENU createMenu(HWND hWnd)
 
 	AppendMenu(mainMenu, MF_STRING | MF_POPUP, (UINT)PopMenuEdit, L"&Редактирование");
 	AppendMenu(PopMenuEdit, MF_STRING | MF_POPUP, (UINT)PopMenuEditObject, L"Редактировать");
+	AppendMenu(PopMenuEdit, MF_STRING | MF_POPUP, (UINT)PopMenuAddObject, L"Добавить");
+	AppendMenu(PopMenuEdit, MF_STRING | MF_POPUP, (UINT)PopMenuDelObject, L"Удалить");
 	AppendMenu(PopMenuEditObject, MF_STRING, EDIT_BRANCH, L"Переименовать папку");
-	AppendMenu(PopMenuEditObject, MF_STRING, EDIT_KEY, L"Изменить ключ");
-	AppendMenu(PopMenuEdit, MF_STRING, EDIT_ADD, L"Добавить");
-	AppendMenu(PopMenuEdit, MF_STRING, EDIT_DEL, L"Удалить");
+	AppendMenu(PopMenuEditObject, MF_STRING, EDIT_KEY, L"Изменить имя и значение ключа");
+	AppendMenu(PopMenuAddObject, MF_STRING, ADD_BRANCH, L"Добавить папку");
+	AppendMenu(PopMenuAddObject, MF_STRING, ADD_KEY, L"Добавить ключ");
+	AppendMenu(PopMenuDelObject, MF_STRING, DEL_BRANCH, L"Удалить папку");
+	AppendMenu(PopMenuDelObject, MF_STRING, DEL_KEY, L"Удалить ключ");
 
 	SetMenu(hWnd, mainMenu);
 	SetMenu(hWnd, PopMenuFile);
@@ -45,32 +51,42 @@ HWND createRegeditTreeView(HWND hWnd, HINSTANCE hInstance)
 		(HMENU)REG_TREE_VIEW,
 		(HINSTANCE)GetWindowLong(hWnd, GWL_HINSTANCE),
 		NULL);
-
-	/*
-	HIMAGELIST hImageList;
-	hImageList = ImageList_Create(16, 16, ILC_COLOR16, 2, 10);
-	HBITMAP hBitMap;   // bitmap handler
-					   // load the picture from the resource
-	hBitMap = LoadBitmap(hInstance, MAKEINTRESOURCE(IDB_BITMAP1));
-	ImageList_Add(hImageList, hBitMap, NULL);
-	SendDlgItemMessage(hWnd, REG_TREE_VIEW, TVM_SETIMAGELIST, 0, (LPARAM)hImageList);
-	*/
-
 	return regeditTreeView;
 }
 
 HWND createRegeditListView(HWND hWnd)
 {
-	// Create the list-view window in report view with label editing enabled.
 	HWND regeditListView = CreateWindowEx(0,
 		WC_LISTVIEW,
 		TEXT("Реестр"),
 		WS_VISIBLE | WS_CHILD | LVS_REPORT | LVS_EDITLABELS | WS_BORDER,
 		415, 5,
-		400, 810,
+		700, 810,
 		hWnd,
 		(HMENU)REG_LIST_VIEW,
 		(HINSTANCE)GetWindowLong(hWnd, GWL_HINSTANCE),
 		NULL);
+	ListView_SetExtendedListViewStyle(regeditListView, LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES);
+
+	LVCOLUMN col;
+	col.iSubItem = 0;
+	col.mask = LVCF_TEXT | LVCF_FMT | LVCF_WIDTH | LVCF_SUBITEM;
+	col.fmt = LVCFMT_LEFT;
+
+	col.pszText = COL_NAME;
+	col.cchTextMax = wcslen(COL_NAME) + 1;
+	col.cx = 200;
+	ListView_InsertColumn(regeditListView, 0, &col);
+	
+	col.pszText = COL_TYPE;
+	col.cchTextMax = wcslen(COL_TYPE) + 1;
+	col.cx = 100;
+	ListView_InsertColumn(regeditListView, 1, &col);
+	
+	col.pszText = COL_VALUE;
+	col.cchTextMax = wcslen(COL_VALUE) + 1;
+	col.cx = 400;
+	ListView_InsertColumn(regeditListView, 2, &col);
+	
 	return regeditListView;
 }

@@ -29,7 +29,6 @@ void GetFullPath(HTREEITEM hItem, HTREEITEM *root, HWND hTreeView, LPWSTR buf)
 		wcscpy(tmpoverlap, buf);
 		wsprintf(buf, L"%s%s%s", item.pszText, L"\\", tmpoverlap);
 	}
-	//wcscat(buf, L"*");
 }
 
 void removeHKRoot(TCHAR fullPath[MAX_KEY_LENGTH])
@@ -62,7 +61,7 @@ void removeSubStr(TCHAR str[MAX_KEY_LENGTH], TCHAR substr[MAX_KEY_LENGTH])
 	int pos = wcsstr(str, substr) - str;
 	if (pos >= 0)
 	{
-		wcscpy(str + pos, str + pos + wcslen(str));
+		wcscpy(str + pos, str + pos + wcslen(substr));
 	}
 }
 

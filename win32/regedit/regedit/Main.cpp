@@ -10,6 +10,7 @@ HWND regeditTreeView; //контрол для отображения дерева реестра
 HWND regeditListView; // контрол для отображения значений выбранной ветки
 HMENU mainMenu; //меню приложения
 HTREEITEM *root; //корневой элемент для TreeView
+СurrentItem currItem;
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
@@ -37,7 +38,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		return 1;
 	}
 	
-	HWND hWnd = CreateWindow(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, 900, 900, NULL, NULL, hInstance, NULL);
+	HWND hWnd = CreateWindow(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, 1200, 900, NULL, NULL, hInstance, NULL);
 	if (!hWnd)
 	{
 		MessageBox(NULL, _T("Call to CreateWindow failed!"), _T("regedit"), NULL);
@@ -74,13 +75,54 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			break;
 		case WM_COMMAND: 
 		{
+			//---------------------------------------------------- ВЫХОД ---------------------------
 			if (LOWORD(wParam) == FILE_EXIT) //нажат пункт меню Выход
 			{
 				SendMessage(hWnd, WM_CLOSE, 0, 0);
-			}
+			} else
+			//---------------------------------------------------- СОЗДАНИЕ ДАМПА ------------------
 			if (LOWORD(wParam) == FILE_DUMP) //нажат пункт меню Создать дамп
 			{
 				dumpRegistry(); //вызов функции создания дампа
+			} else
+			//---------------------------------------------------- УДАЛЕНИЕ ПАРАМЕТРА --------------
+			if (LOWORD(wParam) == DEL_KEY) //нажат пункт Удалить параметр
+			{
+				if (currItem.currListItem == -1)
+				{
+					MessageBox(hWnd, L"Не выбран ни один параметр", L"OK", MB_OK);
+					break;
+				}
+				//Получаем путь до текущего параметра ключа
+				TCHAR fullPath[MAX_KEY_LENGTH] = _T("");
+				GetFullPath(currItem.currTreeNode, root, regeditTreeView, fullPath);
+				//Получаем имя текущего параметра ключа
+				TCHAR pszText[MAX_KEY_LENGTH];
+				ListView_GetItemText(regeditListView, currItem.currListItem, 0, pszText, MAX_KEY_LENGTH);
+				if (deleteParam(fullPath, pszText) != ERROR_SUCCESS) //вызов функции создания дампа
+				{
+					MessageBox(hWnd, L"Ошибка при удалении параметра", L"OK", MB_OK);
+				}
+				else
+				{
+					MessageBox(hWnd, L"Параметр удален успешно", L"OK", MB_OK);
+				}
+			} else
+			//---------------------------------------------------- УДАЛЕНИЕ ВЕТКИ РЕЕСТРА --------------
+			if (LOWORD(wParam) == DEL_BRANCH) //нажат пункт Удалить ветку
+			{
+				//Получаем путь до текущего параметра ключа
+				TCHAR fullPath[MAX_KEY_LENGTH] = _T("");
+				GetFullPath(currItem.currTreeNode, root, regeditTreeView, fullPath);
+				if (deleteBranch(fullPath) != ERROR_SUCCESS)
+				{
+					MessageBox(hWnd, L"Ошибка при удалении ветки", L"OK", MB_OK);
+				}
+				else
+				{
+					MessageBox(hWnd, L"Ветка удалена успешно", L"OK", MB_OK);
+				}
+
 			}
 			break;
 		}
@@ -93,34 +135,57 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		{
 			switch (LOWORD(wParam))
 			{
-			case REG_TREE_VIEW: // события связанные с контролом TreeView
-				if (((LPNMHDR)lParam)->code == TVN_SELCHANGED)//событие на выделение пункта в списке
+				case REG_TREE_VIEW: // события связанные с контролом TreeView
 				{
-					HTREEITEM hClicked = ((NMTREEVIEW*)lParam)->itemNew.hItem; //получаем указатель на выделенную строку
-					TCHAR fullPath[MAX_KEY_LENGTH]=_T("");
-					/*Если выделена строка отличная от корня
-					то находим полный путь в реестре до этого каталога
-					и перечисляем все ключи и их значения в контроле ListView
-					*/
-					if (hClicked != *root) 
+					if (((LPNMHDR)lParam)->code == TVN_SELCHANGED)//событие на выделение пункта в списке
 					{
-						GetFullPath(((NMTREEVIEW*)lParam)->itemNew.hItem, root, regeditTreeView, fullPath);
-						//ListDirectory(g_hListView, activePath);
-					}
-
-				}
-				else if (((LPNMHDR)lParam)->code == TVN_ITEMEXPANDING) //событие на разворачивание пункта в списке
-				{
-					HTREEITEM hClicked = ((NMTREEVIEW*)lParam)->itemNew.hItem;
-					TCHAR fullPath[MAX_KEY_LENGTH] = _T("");
-					if (((NMTREEVIEW*)lParam)->action == TVE_EXPAND)
-					{
-						if (hClicked != *root)
+						HTREEITEM hClicked = ((NMTREEVIEW*)lParam)->itemNew.hItem; //получаем указатель на выделенную строку
+						TCHAR fullPath[MAX_KEY_LENGTH]=_T("");
+						/*Если выделена строка отличная от корня
+						то находим полный путь в реестре до этого каталога
+						и перечисляем все ключи и их значения в контроле ListView
+						*/
+						if (hClicked != *root) 
 						{
-							GetFullPath(((NMTREEVIEW*)lParam)->itemNew.hItem, root, regeditTreeView, fullPath);
-							clearBranch(regeditTreeView, ((NMTREEVIEW*)lParam)->itemNew.hItem);
-							updateSubCatalogs(hWnd, ((NMTREEVIEW*)lParam)->itemNew, fullPath);
+							GetFullPath(hClicked, root, regeditTreeView, fullPath);
+							currItem.currTreeNode = hClicked;
+							enumKeys(regeditListView, fullPath);
 						}
+
+					}
+					else if (((LPNMHDR)lParam)->code == TVN_ITEMEXPANDING) //событие на разворачивание пункта в списке
+					{
+						HTREEITEM hClicked = ((NMTREEVIEW*)lParam)->itemNew.hItem;
+						TCHAR fullPath[MAX_KEY_LENGTH] = _T("");
+						if (((NMTREEVIEW*)lParam)->action == TVE_EXPAND)
+						{
+							if (hClicked != *root)
+							{
+								//получаем путь до каталога
+								GetFullPath(hClicked, root, regeditTreeView, fullPath);
+								//предварительно очищаем потомков текущего узла в дереве
+								clearBranch(regeditTreeView, ((NMTREEVIEW*)lParam)->itemNew.hItem);
+								//обновляем содержимое узла дерева
+								updateSubCatalogs(hWnd, ((NMTREEVIEW*)lParam)->itemNew, fullPath);
+							}
+							else 
+								break;
+						}
+					}
+					break;
+				}
+				case REG_LIST_VIEW:// события связанные с контролом ListView
+				{
+					if (((LPNMHDR)lParam)->code == NM_CLICK)//событие на выделение пункта в списке ListView
+					{
+						//номер выделенной строки
+						LPNMITEMACTIVATE  lpnmitem = (LPNMITEMACTIVATE)lParam; //указатель на текущую позицию в списке
+						currItem.currListItem = lpnmitem->iItem;
+
+						//Получить текст строки
+						//TCHAR pszText[MAX_KEY_LENGTH];
+						//ListView_GetItemText(regeditListView, currItem.currListItem, 0, pszText, MAX_KEY_LENGTH);
+
 					}
 				}
 			}

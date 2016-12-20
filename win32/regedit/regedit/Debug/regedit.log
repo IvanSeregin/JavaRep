@@ -1,21 +1,25 @@
 ﻿  regedit.cpp
-d:\git\javarep\win32\regedit\regedit\regedit.cpp(20): warning C4996: 'wcscpy': This function or variable may be unsafe. Consider using wcscpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-  c:\program files\windows kits\10\include\10.0.10240.0\ucrt\corecrt_wstring.h(121): note: see declaration of 'wcscpy'
-d:\git\javarep\win32\regedit\regedit\regedit.cpp(118): warning C4996: 'wcstombs': This function or variable may be unsafe. Consider using wcstombs_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-  c:\program files\windows kits\10\include\10.0.10240.0\ucrt\stdlib.h(1008): note: see declaration of 'wcstombs'
-d:\git\javarep\win32\regedit\regedit\regedit.cpp(144): warning C4996: '_ultoa': This function or variable may be unsafe. Consider using _ultoa_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-  c:\program files\windows kits\10\include\10.0.10240.0\ucrt\stdlib.h(683): note: see declaration of '_ultoa'
-d:\git\javarep\win32\regedit\regedit\regedit.cpp(148): warning C4996: 'ultoa': The POSIX name for this item is deprecated. Instead, use the ISO C and C++ conformant name: _ultoa. See online help for details.
-  c:\program files\windows kits\10\include\10.0.10240.0\ucrt\stdlib.h(1338): note: see declaration of 'ultoa'
-d:\git\javarep\win32\regedit\regedit\regedit.cpp(152): warning C4996: 'wcstombs': This function or variable may be unsafe. Consider using wcstombs_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-  c:\program files\windows kits\10\include\10.0.10240.0\ucrt\stdlib.h(1008): note: see declaration of 'wcstombs'
-d:\git\javarep\win32\regedit\regedit\regedit.cpp(157): warning C4996: 'wcstombs': This function or variable may be unsafe. Consider using wcstombs_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-  c:\program files\windows kits\10\include\10.0.10240.0\ucrt\stdlib.h(1008): note: see declaration of 'wcstombs'
-  helpers.cpp
-d:\git\javarep\win32\regedit\regedit\helpers.cpp(29): warning C4996: 'wcscpy': This function or variable may be unsafe. Consider using wcscpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-  c:\program files\windows kits\10\include\10.0.10240.0\ucrt\corecrt_wstring.h(121): note: see declaration of 'wcscpy'
-d:\git\javarep\win32\regedit\regedit\helpers.cpp(11): warning C4101: 'tmphItem': unreferenced local variable
-d:\git\javarep\win32\regedit\regedit\helpers.cpp(65): warning C4996: 'wcscpy': This function or variable may be unsafe. Consider using wcscpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-  c:\program files\windows kits\10\include\10.0.10240.0\ucrt\corecrt_wstring.h(121): note: see declaration of 'wcscpy'
-  Generating Code...
+d:\git\javarep\win32\regedit\regedit\regedit.cpp(23): warning C4996: 'wcscpy': This function or variable may be unsafe. Consider using wcscpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files\windows kits\10\include\10.0.10240.0\ucrt\corecrt_wstring.h(121): note:  см. объявление "wcscpy"
+d:\git\javarep\win32\regedit\regedit\regedit.cpp(121): warning C4996: 'wcstombs': This function or variable may be unsafe. Consider using wcstombs_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files\windows kits\10\include\10.0.10240.0\ucrt\stdlib.h(1008): note:  см. объявление "wcstombs"
+d:\git\javarep\win32\regedit\regedit\regedit.cpp(153): warning C4996: 'wcstombs': This function or variable may be unsafe. Consider using wcstombs_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files\windows kits\10\include\10.0.10240.0\ucrt\stdlib.h(1008): note:  см. объявление "wcstombs"
+d:\git\javarep\win32\regedit\regedit\regedit.cpp(159): warning C4996: 'ultoa': The POSIX name for this item is deprecated. Instead, use the ISO C and C++ conformant name: _ultoa. See online help for details.
+  c:\program files\windows kits\10\include\10.0.10240.0\ucrt\stdlib.h(1338): note:  см. объявление "ultoa"
+d:\git\javarep\win32\regedit\regedit\regedit.cpp(163): warning C4996: 'wcstombs': This function or variable may be unsafe. Consider using wcstombs_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files\windows kits\10\include\10.0.10240.0\ucrt\stdlib.h(1008): note:  см. объявление "wcstombs"
+d:\git\javarep\win32\regedit\regedit\regedit.cpp(168): warning C4996: 'wcstombs': This function or variable may be unsafe. Consider using wcstombs_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files\windows kits\10\include\10.0.10240.0\ucrt\stdlib.h(1008): note:  см. объявление "wcstombs"
+d:\git\javarep\win32\regedit\regedit\regedit.cpp(304): warning C4018: <: несоответствие типов со знаком и без знака
+d:\git\javarep\win32\regedit\regedit\regedit.cpp(389): warning C4101: cchMaxValue: неиспользованная локальная переменная
+d:\git\javarep\win32\regedit\regedit\regedit.cpp(388): warning C4101: cValues: неиспользованная локальная переменная
+d:\git\javarep\win32\regedit\regedit\regedit.cpp(381): warning C4101: achKey: неиспользованная локальная переменная
+d:\git\javarep\win32\regedit\regedit\regedit.cpp(392): warning C4101: ftLastWriteTime: неиспользованная локальная переменная
+d:\git\javarep\win32\regedit\regedit\regedit.cpp(387): warning C4101: cchMaxClass: неиспользованная локальная переменная
+d:\git\javarep\win32\regedit\regedit\regedit.cpp(390): warning C4101: cbMaxValueData: неиспользованная локальная переменная
+d:\git\javarep\win32\regedit\regedit\regedit.cpp(386): warning C4101: cbMaxSubKey: неиспользованная локальная переменная
+d:\git\javarep\win32\regedit\regedit\regedit.cpp(391): warning C4101: cbSecurityDescriptor: неиспользованная локальная переменная
+d:\git\javarep\win32\regedit\regedit\regedit.cpp(382): warning C4101: cbName: неиспользованная локальная переменная
+d:\git\javarep\win32\regedit\regedit\regedit.cpp(394): warning C4101: retCode: неиспользованная локальная переменная
   regedit.vcxproj -> D:\git\JavaRep\win32\regedit\Debug\regedit.exe
