@@ -1,4 +1,4 @@
-#include "definitions.h"
+#include "definitions.h" 
 #include <stdio.h>
 #include <string>
 
@@ -322,7 +322,7 @@ void updateSubCatalogs(HWND hWnd, TV_ITEMW Parent, TCHAR fullPath[MAX_KEY_LENGTH
 	}
 	else
 	{
-		return;
+		return; 
 	}
 }
 //функция возвращает корневой каталог по полученному пути
