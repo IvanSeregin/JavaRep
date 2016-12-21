@@ -94,3 +94,18 @@ void clearBranch(HWND hTreeView, HTREEITEM hItem)
 		ClearSubBranches(hTreeView, hChild);
 	}
 }
+
+TV_ITEM getCurrentItem(HWND hTreeView, HTREEITEM hItem)
+{
+	TV_ITEM item = { 0 };
+	TCHAR tmppath[MAX_KEY_LENGTH];
+	TCHAR tmpoverlap[MAX_KEY_LENGTH];
+	HTREEITEM tmphItem;
+
+	item.mask = TVIF_TEXT;
+	item.pszText = tmppath;
+	item.cchTextMax = MAX_KEY_LENGTH;
+	item.hItem = hItem;
+	TreeView_GetItem(hTreeView, &item);
+	return item;
+}

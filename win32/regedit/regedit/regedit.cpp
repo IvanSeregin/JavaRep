@@ -466,3 +466,10 @@ int deleteBranch(TCHAR fullPath[MAX_KEY_LENGTH])
 	removeHKRoot(fullPath);
 	return RegDeleteTree(hKey, fullPath);
 }
+
+int renameBranch(TCHAR fullPath[MAX_KEY_LENGTH], TCHAR newName[MAX_KEY_LENGTH])
+{
+	HKEY hKey = determineHKEY(fullPath);
+	removeHKRoot(fullPath);
+	return RegRenameKey(hKey, fullPath, newName);
+}

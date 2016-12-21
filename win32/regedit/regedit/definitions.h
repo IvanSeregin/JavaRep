@@ -19,14 +19,14 @@
 #define FILE_SAVE_CURR	103
 #define FILE_EXIT		104
 #define FIND_FIND		105
-#define DEL_KEY			106 //Удалить ключ
-#define ADD_BRANCH		107 //Добавить ветку
-#define DEL_BRANCH		108 //Удалить ветку
-#define EDIT_BRANCH		109 //Редактировать ветку
-#define EDIT_KEY		110 //Редактировать ключ
+#define DEL_KEY			106 //Удалить ключ +
+#define ADD_BRANCH		107 //Добавить ветку -
+#define DEL_BRANCH		108 //Удалить ветку +
+#define EDIT_BRANCH		109 //Редактировать ветку+
+#define EDIT_KEY		110 //Редактировать ключ -
 #define DST_TREEVIEW	111
 #define DST_FILE		112
-#define ADD_KEY			113 //Добавить ключ
+#define ADD_KEY			113 //Добавить ключ -
 
 //коды веток реестра
 #define HKCR HKEY_CLASSES_ROOT
@@ -57,8 +57,11 @@ bool dumpRegistry(); //создает дамп реестра в файл
 void GetFullPath(HTREEITEM hItem, HTREEITEM *root, HWND hTreeView, LPWSTR buf); //получае полный путь до выбранного каталога
 void updateSubCatalogs(HWND hTreeView, TV_ITEMW Parent, TCHAR fullPath[MAX_KEY_LENGTH]); //сканирует и добавляет каталоги к выбранному каталогу
 void removeHKRoot(TCHAR fullPath[MAX_KEY_LENGTH]);//функция удаляет из пути название корневой ветки реестра
-void clearBranch(HWND hTreeView, HTREEITEM hItem);
+void clearBranch(HWND hTreeView, HTREEITEM hItem);//удаляет все подэлементы текущего узла, используется при сворачивании ветки
 void enumKeys(HWND hListView, TCHAR fullPath[MAX_KEY_LENGTH]);//выводит список ключей и их параметров
-int deleteParam(TCHAR fullPath[MAX_KEY_LENGTH], TCHAR keyName[MAX_KEY_LENGTH]);
-int deleteBranch(TCHAR fullPath[MAX_KEY_LENGTH]);
+int deleteParam(TCHAR fullPath[MAX_KEY_LENGTH], TCHAR keyName[MAX_KEY_LENGTH]);//удаляет параметр реестра
+int deleteBranch(TCHAR fullPath[MAX_KEY_LENGTH]);//удаляет ветку реестра
+int renameBranch(TCHAR fullPath[MAX_KEY_LENGTH], TCHAR newName[MAX_KEY_LENGTH]);
+TV_ITEM getCurrentItem(HWND hTreeView, HTREEITEM hItem); //получает текущий узел дерева
+
 #endif //_LAYOUT_H

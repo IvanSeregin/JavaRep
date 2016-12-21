@@ -10,7 +10,8 @@ HWND regeditTreeView; //контрол для отображения дерева реестра
 HWND regeditListView; // контрол для отображения значений выбранной ветки
 HMENU mainMenu; //меню приложения
 HTREEITEM *root; //корневой элемент для TreeView
-СurrentItem currItem;
+СurrentItem currItem; //структура для хранения текущего узла дерева и элемента списка
+HWND *htvEdit = new HWND; // редактируемый узел дерева
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
@@ -18,6 +19,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	WNDCLASSEX wcex;
 	static TCHAR szWindowClass[] = _T("regedit");
 	static TCHAR szTitle[] = _T("regedit");
+	//htvEdit = NULL;
 	
 	wcex.cbSize = sizeof(WNDCLASSEX);
 	wcex.style = CS_HREDRAW | CS_VREDRAW;
@@ -71,6 +73,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			return DefWindowProc(hWnd, message, wParam, lParam);
 			break;
 		case WM_DESTROY:
+			delete htvEdit;
 			PostQuitMessage(0);
 			break;
 		case WM_COMMAND: 
@@ -85,6 +88,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			{
 				dumpRegistry(); //вызов функции создания дампа
 			} else
+			//------------------------------------ ПЕРЕИМЕНОВАНИЕ КАТАЛОГА -------------------------
+			if (LOWORD(wParam) == EDIT_BRANCH) //нажат пункт меню Редактировать каталог
+			{
+				*htvEdit = TreeView_EditLabel(regeditTreeView, currItem.currTreeNode);
+			}
+			else
 			//---------------------------------------------------- УДАЛЕНИЕ ПАРАМЕТРА --------------
 			if (LOWORD(wParam) == DEL_KEY) //нажат пункт Удалить параметр
 			{
@@ -137,7 +146,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			{
 				case REG_TREE_VIEW: // события связанные с контролом TreeView
 				{
-					if (((LPNMHDR)lParam)->code == TVN_SELCHANGED)//событие на выделение пункта в списке
+					//--------------------- событие на выделение пункта в списке
+					if (((LPNMHDR)lParam)->code == TVN_SELCHANGED)
 					{
 						HTREEITEM hClicked = ((NMTREEVIEW*)lParam)->itemNew.hItem; //получаем указатель на выделенную строку
 						TCHAR fullPath[MAX_KEY_LENGTH]=_T("");
@@ -153,7 +163,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 						}
 
 					}
-					else if (((LPNMHDR)lParam)->code == TVN_ITEMEXPANDING) //событие на разворачивание пункта в списке
+					//---------------- //событие на разворачивание пункта в списке
+					else if (((LPNMHDR)lParam)->code == TVN_ITEMEXPANDING) 
 					{
 						HTREEITEM hClicked = ((NMTREEVIEW*)lParam)->itemNew.hItem;
 						TCHAR fullPath[MAX_KEY_LENGTH] = _T("");
@@ -172,6 +183,21 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 								break;
 						}
 					}
+					//------------------- событие при изменении узла дерева----------------------------------
+					else if (((LPNMHDR)lParam)->code == TVN_ENDLABELEDIT)
+					{
+						//Получаем путь до текущего каталога
+						TCHAR fullPath[MAX_KEY_LENGTH] = _T("");
+						GetFullPath(currItem.currTreeNode, root, regeditTreeView, fullPath);
+						//переименовываем узел дерева
+						TV_ITEM currTVItem = getCurrentItem(regeditTreeView, currItem.currTreeNode);
+						TCHAR newLabelText[MAX_KEY_LENGTH] = _T("");
+						GetWindowText(*htvEdit, newLabelText, MAX_KEY_LENGTH);
+						wcscpy(currTVItem.pszText, newLabelText);
+						TreeView_SetItem(regeditTreeView, &currTVItem);
+						//изменяем в реестре
+						renameBranch(fullPath, newLabelText);
+					}
 					break;
 				}
 				case REG_LIST_VIEW:// события связанные с контролом ListView
@@ -187,6 +213,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 						//ListView_GetItemText(regeditListView, currItem.currListItem, 0, pszText, MAX_KEY_LENGTH);
 
 					}
+					break;
 				}
 			}
 			break;
@@ -204,4 +231,6 @@ void setupWindow(HWND hWnd, HINSTANCE hInstance)
 	regeditListView = createRegeditListView(hWnd);
 	mainMenu = createMenu(hWnd);
 }
+/*
 
+*/
