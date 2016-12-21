@@ -88,6 +88,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			{
 				dumpRegistry(); //вызов функции создания дампа
 			} else
+			//---------------------------------------------------- СОЗДАНИЕ ДАМПА ВЕТКИ------------------
+			if (LOWORD(wParam) == FILE_SAVE_CURR) //нажат пункт меню Создать дамп
+			{
+				TCHAR fullPath[MAX_KEY_LENGTH] = _T("");
+				GetFullPath(currItem.currTreeNode, root, regeditTreeView, fullPath);
+				dumBranch(fullPath); //вызов функции создания дампа
+			}
+			else
 			//------------------------------------ ПЕРЕИМЕНОВАНИЕ КАТАЛОГА -------------------------
 			if (LOWORD(wParam) == EDIT_BRANCH) //нажат пункт меню Редактировать каталог
 			{
@@ -95,7 +103,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			}
 			else
 			//---------------------------------------------------- УДАЛЕНИЕ ПАРАМЕТРА --------------
-			if (LOWORD(wParam) == DEL_KEY) //нажат пункт Удалить параметр
+			if (LOWORD(wParam) == DEL_PARAM) //нажат пункт Удалить параметр
 			{
 				if (currItem.currListItem == -1)
 				{
@@ -108,12 +116,22 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				//Получаем имя текущего параметра ключа
 				TCHAR pszText[MAX_KEY_LENGTH];
 				ListView_GetItemText(regeditListView, currItem.currListItem, 0, pszText, MAX_KEY_LENGTH);
-				if (deleteParam(fullPath, pszText) != ERROR_SUCCESS) //вызов функции создания дампа
+				if (deleteParam(fullPath, pszText) != ERROR_SUCCESS)
 				{
 					MessageBox(hWnd, L"Ошибка при удалении параметра", L"OK", MB_OK);
 				}
 				else
 				{
+					NMHDR nmh;
+					nmh.code = TVN_SELCHANGED;
+					nmh.idFrom = GetDlgCtrlID(regeditTreeView);
+					nmh.hwndFrom = regeditTreeView;
+					
+					NM_TREEVIEW t;
+					t.action = TVN_SELCHANGED;
+					t.hdr = nmh;
+					t.itemNew.hItem = currItem.currTreeNode;
+					SendMessage(hWnd, WM_NOTIFY, LOWORD(REG_TREE_VIEW), (LPARAM)&t);
 					MessageBox(hWnd, L"Параметр удален успешно", L"OK", MB_OK);
 				}
 			} else
@@ -129,9 +147,35 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				}
 				else
 				{
-					MessageBox(hWnd, L"Ветка удалена успешно", L"OK", MB_OK);
-				}
+					//Обновляем ветку- родителя
+					NMHDR nmh;
+					nmh.code = TVN_ITEMEXPANDING;
+					nmh.idFrom = GetDlgCtrlID(regeditTreeView);
+					nmh.hwndFrom = regeditTreeView;
 
+					NM_TREEVIEW t;
+					t.action = TVE_EXPAND;
+					t.hdr = nmh;
+					t.itemNew.hItem = TreeView_GetParent(regeditTreeView, currItem.currTreeNode);
+					currItem.currTreeNode = t.itemNew.hItem;
+					SendMessage(hWnd, WM_NOTIFY, LOWORD(REG_TREE_VIEW), (LPARAM)&t);
+					MessageBox(hWnd, L"Ветка удалена успешно", L"OK", MB_OK);
+
+				}				
+			}
+			//--------------------------------------ДОБАВЛЕНИЕ КАТАЛОГА -----------------------
+			if (LOWORD(wParam) == ADD_BRANCH)
+			{
+				//Получаем путь до текущего каталога
+				TCHAR fullPath[MAX_KEY_LENGTH] = _T("");
+				GetFullPath(currItem.currTreeNode, root, regeditTreeView, fullPath);
+				//Пробуем добавить новый каталог, если все ок, то добавляем также узел в дерево
+				if (addBranch(fullPath, L"Новый раздел") == ERROR_SUCCESS)
+				{
+					insertInTreeView(hWnd, currItem.currTreeNode, L"Новый раздел");
+				}
+				else
+					MessageBox(hWnd, L"Невозможно создать раздел", L"OK", MB_OK);
 			}
 			break;
 		}
@@ -161,7 +205,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 							currItem.currTreeNode = hClicked;
 							enumKeys(regeditListView, fullPath);
 						}
-
 					}
 					//---------------- //событие на разворачивание пункта в списке
 					else if (((LPNMHDR)lParam)->code == TVN_ITEMEXPANDING) 
@@ -231,6 +274,3 @@ void setupWindow(HWND hWnd, HINSTANCE hInstance)
 	regeditListView = createRegeditListView(hWnd);
 	mainMenu = createMenu(hWnd);
 }
-/*
-
-*/

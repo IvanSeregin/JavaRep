@@ -2,14 +2,6 @@
 #include <stdio.h>
 #include <string>
 
-
-
-HKEY dumpCatalog(HKEY hRootKey, HKEY hKey, TCHAR path[], HANDLE hFile); //сохранение указанного каталога в файл
-HKEY determineHKEY(TCHAR path[MAX_KEY_LENGTH]); // определ€ет ветку реестра по полному пути до каталога
-HTREEITEM insertInTreeView(HWND hWnd, HTREEITEM parent, TCHAR achKey[MAX_KEY_LENGTH]); //вставл€ет новый подкаталог в текущий каталог
-void insertRow(HWND hlistView, TCHAR name[MAX_KEY_LENGTH], TCHAR type[MAX_KEY_LENGTH], TCHAR value[MAX_KEY_LENGTH]); //вставл€ет новую строку в ListView
-HKEY openKey(TCHAR fullPath[MAX_KEY_LENGTH]);
-
 //функци€ сохран€ет весь реестр в файл
 bool dumpRegistry()
 {
@@ -70,6 +62,48 @@ bool dumpRegistry()
 	CloseHandle(hFile);
 	return true;
 }
+
+bool dumBranch(TCHAR path[MAX_KEY_LENGTH])
+{
+	HKEY key;
+	TCHAR fileName[MAX_KEY_LENGTH] = _T("");
+	TCHAR *hkeyStr;
+	char nm[MAX_KEY_LENGTH] = "";
+	PWSTR fName;
+	//ѕолучаем путь до рабочего стола текущего пользовател€
+	//и генерируем им€ файла дл€ сохранени€ реестра
+	if (SHGetKnownFolderPath(FOLDERID_Desktop, KF_FLAG_DEFAULT, NULL, &fName) == S_OK)
+	{
+		wcscpy(fileName, fName);
+		wcscat_s(fileName, _T("\\regedit.txt"));
+	}
+	else
+		return false;
+
+	//ѕробуем открыть полученный файл
+	HANDLE hFile = CreateFile(fileName, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+
+	if (!hFile) return false;
+	//получаем указатель на корневой каталог
+	HKEY hRootKey = determineHKEY(path);
+	//получаем им€ корневого каталога в текстовом виде
+	hkeyStr = removeHKRoot(path);
+	//записываем им€ корневого каталога в файл
+	wcstombs(nm, hkeyStr, MAX_KEY_LENGTH);
+	WriteFile(hFile, nm, strlen(nm), NULL, NULL);
+	WriteFile(hFile, "\n", strlen("\n"), NULL, NULL);
+	delete[] hkeyStr;
+	//сохран€ем ветку реестра в файл
+	if (RegOpenKeyEx(hRootKey, path, 0, KEY_READ, &key) == ERROR_SUCCESS)
+	{
+		dumpCatalog(hRootKey, key, path, hFile);
+		RegCloseKey(key);
+	}
+	CloseHandle(hFile);
+
+	return true;
+}
+
 
 HKEY dumpCatalog(HKEY hRootKey, HKEY hKey, TCHAR path[], HANDLE hFile)
 {
@@ -325,7 +359,7 @@ void updateSubCatalogs(HWND hWnd, TV_ITEMW Parent, TCHAR fullPath[MAX_KEY_LENGTH
 		return; 
 	}
 }
-//функци€ возвращает корневой каталог по полученному пути
+//функци€ возвращает указатель на корневой каталог по полученному пути
 //если строка не €вл€етс€ валидным ключем реестра, то возвращаетс€ 0
 HKEY determineHKEY(TCHAR path[MAX_KEY_LENGTH])
 {
@@ -441,7 +475,7 @@ void enumKeys(HWND hListView, TCHAR fullPath[MAX_KEY_LENGTH]) //выводит список к
 	
 }
 
-int deleteParam(TCHAR fullPath[MAX_KEY_LENGTH], TCHAR keyName[MAX_KEY_LENGTH])
+LRESULT deleteParam(TCHAR fullPath[MAX_KEY_LENGTH], TCHAR keyName[MAX_KEY_LENGTH])
 {
 	HKEY key = openKey(fullPath);
 	if (!RegDeleteValue(key, keyName)) return NULL;
@@ -460,16 +494,29 @@ HKEY openKey(TCHAR fullPath[MAX_KEY_LENGTH])
 	return NULL;
 }
 
-int deleteBranch(TCHAR fullPath[MAX_KEY_LENGTH])
+LRESULT deleteBranch(TCHAR fullPath[MAX_KEY_LENGTH])
 {
 	HKEY hKey = determineHKEY(fullPath);
 	removeHKRoot(fullPath);
 	return RegDeleteTree(hKey, fullPath);
 }
 
-int renameBranch(TCHAR fullPath[MAX_KEY_LENGTH], TCHAR newName[MAX_KEY_LENGTH])
+LRESULT renameBranch(TCHAR fullPath[MAX_KEY_LENGTH], TCHAR newName[MAX_KEY_LENGTH])
 {
 	HKEY hKey = determineHKEY(fullPath);
 	removeHKRoot(fullPath);
 	return RegRenameKey(hKey, fullPath, newName);
+}
+
+LRESULT addBranch(TCHAR fullPath[MAX_KEY_LENGTH], TCHAR newBranchName[MAX_KEY_LENGTH])
+{
+	HKEY hKey = determineHKEY(fullPath);
+	removeHKRoot(fullPath);
+	HKEY key;
+	LRESULT result = RegOpenKeyEx(hKey, fullPath, 0, KEY_CREATE_SUB_KEY, &key);
+	if (result == ERROR_SUCCESS)
+	{
+		result = RegCreateKey(key, newBranchName, &hKey);
+	}
+	return result;
 }

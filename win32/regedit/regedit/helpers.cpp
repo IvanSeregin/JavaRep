@@ -31,28 +31,39 @@ void GetFullPath(HTREEITEM hItem, HTREEITEM *root, HWND hTreeView, LPWSTR buf)
 	}
 }
 
-void removeHKRoot(TCHAR fullPath[MAX_KEY_LENGTH])
+TCHAR* removeHKRoot(TCHAR fullPath[MAX_KEY_LENGTH])
 {
+	TCHAR *hkeyStr = new TCHAR[MAX_KEY_LENGTH];
 	if (wcsstr(fullPath, _T("HKEY_CLASSES_ROOT")) != NULL)
 	{
 		removeSubStr(fullPath, _T("HKEY_CLASSES_ROOT\\"));
+		wcscpy(hkeyStr, _T("HKEY_CLASSES_ROOT\\"));
+		return hkeyStr;
 	} else
 	if (wcsstr(fullPath, _T("HKEY_CURRENT_USER")) != NULL)
 	{
 		removeSubStr(fullPath, _T("HKEY_CURRENT_USER\\"));
+		wcscpy(hkeyStr, _T("HKEY_CURRENT_USER\\"));
+		return hkeyStr;
 	} else
 	if (wcsstr(fullPath, _T("HKEY_LOCAL_MACHINE")) != NULL)
 	{
 		removeSubStr(fullPath, _T("HKEY_LOCAL_MACHINE\\"));
+		wcscpy(hkeyStr, _T("HKEY_LOCAL_MACHINE\\"));
+		return hkeyStr;
 	} else
 	if (wcsstr(fullPath, _T("HKEY_USERS")) != NULL)
 	{
 		removeSubStr(fullPath, _T("HKEY_USERS\\"));
+		wcscpy(hkeyStr, _T("HKEY_USERS\\"));
+		return hkeyStr;
 	} else
 	if (wcsstr(fullPath, _T("HKEY_CURRENT_CONFIG")) != NULL)
 	{
 		removeSubStr(fullPath, _T("HKEY_CURRENT_CONFIG\\"));
-	} else	return;
+		wcscpy(hkeyStr, _T("HKEY_CURRENT_CONFIG\\"));
+		return hkeyStr;
+	} else	return _T("");
 }
 
 //функция удаления подстроки substr из строки str

@@ -15,18 +15,18 @@
 //коды контролов
 #define REG_TREE_VIEW	100
 #define REG_LIST_VIEW	101
-#define FILE_DUMP		102
-#define FILE_SAVE_CURR	103
-#define FILE_EXIT		104
-#define FIND_FIND		105
-#define DEL_KEY			106 //Удалить ключ +
-#define ADD_BRANCH		107 //Добавить ветку -
+#define FILE_DUMP		102 //Создание дампа +
+#define FILE_SAVE_CURR	103 //Сохранение ветки +
+#define FILE_EXIT		104 //Выход из приложения +
+#define FIND_FIND		105 //Поиск в реестре --
+#define DEL_PARAM		106 //Удалить параметр +
+#define ADD_BRANCH		107 //Добавить ветку +
 #define DEL_BRANCH		108 //Удалить ветку +
-#define EDIT_BRANCH		109 //Редактировать ветку+
-#define EDIT_KEY		110 //Редактировать ключ -
+#define EDIT_BRANCH		109 //Редактировать ветку +
+#define EDIT_PARAM		110 //Редактировать параметр --
 #define DST_TREEVIEW	111
 #define DST_FILE		112
-#define ADD_KEY			113 //Добавить ключ -
+#define ADD_PARAM		113 //Добавить параметр --
 
 //коды веток реестра
 #define HKCR HKEY_CLASSES_ROOT
@@ -54,14 +54,21 @@ HMENU createMenu(HWND hWnd);
 
 bool loadRegistry(HWND hWnd, HWND regeditTreeView, HTREEITEM *root); //отображает корневые элементы реестра
 bool dumpRegistry(); //создает дамп реестра в файл
+bool dumBranch(TCHAR path[MAX_KEY_LENGTH]); //создает дамп ветки реестра в файл
 void GetFullPath(HTREEITEM hItem, HTREEITEM *root, HWND hTreeView, LPWSTR buf); //получае полный путь до выбранного каталога
 void updateSubCatalogs(HWND hTreeView, TV_ITEMW Parent, TCHAR fullPath[MAX_KEY_LENGTH]); //сканирует и добавляет каталоги к выбранному каталогу
-void removeHKRoot(TCHAR fullPath[MAX_KEY_LENGTH]);//функция удаляет из пути название корневой ветки реестра
+TCHAR* removeHKRoot(TCHAR fullPath[MAX_KEY_LENGTH]);//функция удаляет из пути название корневой ветки реестра
 void clearBranch(HWND hTreeView, HTREEITEM hItem);//удаляет все подэлементы текущего узла, используется при сворачивании ветки
 void enumKeys(HWND hListView, TCHAR fullPath[MAX_KEY_LENGTH]);//выводит список ключей и их параметров
-int deleteParam(TCHAR fullPath[MAX_KEY_LENGTH], TCHAR keyName[MAX_KEY_LENGTH]);//удаляет параметр реестра
-int deleteBranch(TCHAR fullPath[MAX_KEY_LENGTH]);//удаляет ветку реестра
-int renameBranch(TCHAR fullPath[MAX_KEY_LENGTH], TCHAR newName[MAX_KEY_LENGTH]);
+LRESULT deleteParam(TCHAR fullPath[MAX_KEY_LENGTH], TCHAR keyName[MAX_KEY_LENGTH]);//удаляет параметр реестра
+LRESULT deleteBranch(TCHAR fullPath[MAX_KEY_LENGTH]);//удаляет ветку реестра
+LRESULT renameBranch(TCHAR fullPath[MAX_KEY_LENGTH], TCHAR newName[MAX_KEY_LENGTH]);
+LRESULT addBranch(TCHAR fullPath[MAX_KEY_LENGTH], TCHAR newBranchName[MAX_KEY_LENGTH]);
 TV_ITEM getCurrentItem(HWND hTreeView, HTREEITEM hItem); //получает текущий узел дерева
+HKEY dumpCatalog(HKEY hRootKey, HKEY hKey, TCHAR path[], HANDLE hFile); //сохранение указанного каталога в файл
+HKEY determineHKEY(TCHAR path[MAX_KEY_LENGTH]); // определяет ветку реестра по полному пути до каталога
+HTREEITEM insertInTreeView(HWND hWnd, HTREEITEM parent, TCHAR achKey[MAX_KEY_LENGTH]); //вставляет новый подкаталог в текущий каталог
+void insertRow(HWND hlistView, TCHAR name[MAX_KEY_LENGTH], TCHAR type[MAX_KEY_LENGTH], TCHAR value[MAX_KEY_LENGTH]); //вставляет новую строку в ListView
+HKEY openKey(TCHAR fullPath[MAX_KEY_LENGTH]);
 
 #endif //_LAYOUT_H
