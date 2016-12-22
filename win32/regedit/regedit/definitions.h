@@ -11,6 +11,7 @@
 //константы
 #define MAX_KEY_LENGTH 4096
 #define MAX_VALUE_NAME 16383
+#define TYPE_LENGTH 20
 
 //коды контролов
 #define REG_TREE_VIEW	100
@@ -65,7 +66,7 @@ void enumKeys(HWND hListView, TCHAR fullPath[MAX_KEY_LENGTH]);//выводит список к
 LRESULT deleteParam(TCHAR fullPath[MAX_KEY_LENGTH], TCHAR keyName[MAX_KEY_LENGTH]);//удаляет параметр реестра
 LRESULT deleteBranch(TCHAR fullPath[MAX_KEY_LENGTH]);//удаляет ветку реестра
 LRESULT renameBranch(TCHAR fullPath[MAX_KEY_LENGTH], TCHAR newName[MAX_KEY_LENGTH]);
-LRESULT renameParam(TCHAR fullPath[MAX_KEY_LENGTH], TCHAR oldName[MAX_KEY_LENGTH], TCHAR newName[MAX_KEY_LENGTH]);
+LRESULT renameParam(TCHAR fullPath[MAX_KEY_LENGTH], TCHAR oldName[MAX_KEY_LENGTH], TCHAR newName[MAX_KEY_LENGTH], TCHAR Value[MAX_KEY_LENGTH], TCHAR type[TYPE_LENGTH]);//Переименование параметра в реестре
 LRESULT addBranch(TCHAR fullPath[MAX_KEY_LENGTH], TCHAR newBranchName[MAX_KEY_LENGTH]);
 TV_ITEM getCurrentItem(HWND hTreeView, HTREEITEM hItem); //получает текущий узел дерева
 HKEY dumpCatalog(HKEY hRootKey, HKEY hKey, TCHAR path[], HANDLE hFile); //сохранение указанного каталога в файл

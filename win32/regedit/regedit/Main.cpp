@@ -184,16 +184,27 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			//------------------------------- РЕДАКТИРОВАНИЕ ИМЕНИ ПАРАМЕТРА --------------
 			if (LOWORD(wParam) == EDIT_PARAM)
 			{
-				*htvEdit = ListView_EditLabel(regeditListView, 0);
+				*htvEdit = ListView_EditLabel(regeditListView, 0); //шлется нотификация LVN_ENDLABELEDIT
 			}
 			//------------------------------- РЕДАКТИРОВАНИЕ ЗНАЧЕНИЕ ПАРАМЕТРА --------------
 			if (LOWORD(wParam) == EDIT_PARAM_VALUE)
 			{
+				/*
+				Т.к. очевидного способа отредактировать subItem у itema нет, то над subItem-ом создаем
+				обычный edit, копируем в него текст в subItema и переназначаем оконную процедуру на EditProc
+				Далее эта процедура занимается обработкой сообщений для editа
+				*/
+				//координаты для editа
 				RECT *r1 = new RECT;
+				//заполняем прямоугольник
 				ListView_GetSubItemRect(regeditListView, currItem.currListItem, 2, LVIR_LABEL, r1);
+				//номер редактируемого столбца
 				int iCol = 2;
+				//для текущего текста
 				TCHAR pszText[MAX_KEY_LENGTH] = _T("");
+				//получаем текст у текущего subItema
 				ListView_GetItemText(regeditListView, currItem.currListItem, 2, pszText, MAX_KEY_LENGTH);
+				//создаем edit
 				lvEdit = CreateWindowEx(0,
 					WC_EDIT,
 					pszText,
@@ -203,7 +214,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 					(HMENU)LV_EDIT,
 					(HINSTANCE)GetWindowLong(hWnd, GWL_HINSTANCE),
 					NULL);
+				//меням оконную процедуру
 				wpRecordProc = (WNDPROC)SetWindowLong(lvEdit, GWL_WNDPROC, (LONG)EditProc);
+				//Устанавливаем фокус
 				SetFocus(lvEdit);
 				delete r1;
 			}
@@ -293,16 +306,20 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 						TCHAR fullPath[MAX_KEY_LENGTH] = _T("");
 						TCHAR oldName[MAX_KEY_LENGTH] = _T("");
 						TCHAR newName[MAX_KEY_LENGTH] = _T("");
+						TCHAR value[MAX_KEY_LENGTH] = _T("");
+						TCHAR type[TYPE_LENGTH] = _T("");
 
 						GetFullPath(currItem.currTreeNode, root, regeditTreeView, fullPath);
 
 						//Получаем новое название параметра
 						GetWindowText(*htvEdit, newName, MAX_KEY_LENGTH);
 						ListView_GetItemText(regeditListView, currItem.currListItem, 0, oldName, MAX_KEY_LENGTH);
+						ListView_GetItemText(regeditListView, currItem.currListItem, 1, type, TYPE_LENGTH);
+						ListView_GetItemText(regeditListView, currItem.currListItem, 2, value, MAX_KEY_LENGTH);
 						ListView_SetItemText(regeditListView, currItem.currListItem, 0, newName);
 
 						//Сохраняем новое название в реестре
-						renameParam(fullPath, oldName, newName);
+						renameParam(fullPath, oldName, newName, value, type);
 					}
 					break;
 				}

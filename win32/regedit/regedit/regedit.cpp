@@ -508,31 +508,22 @@ LRESULT renameBranch(TCHAR fullPath[MAX_KEY_LENGTH], TCHAR newName[MAX_KEY_LENGT
 	return RegRenameKey(hKey, fullPath, newName);
 }
 
-LRESULT renameParam(TCHAR fullPath[MAX_KEY_LENGTH], TCHAR oldName[MAX_KEY_LENGTH], TCHAR newName[MAX_KEY_LENGTH])
+LRESULT renameParam(TCHAR fullPath[MAX_KEY_LENGTH], TCHAR oldName[MAX_KEY_LENGTH], TCHAR newName[MAX_KEY_LENGTH], TCHAR Value[MAX_KEY_LENGTH])
 {
 	//сохраняем данные параметра
 	HKEY hKey = determineHKEY(fullPath);
-	HKEY keyToDel = openKey(fullPath);
-	TCHAR Value[MAX_KEY_LENGTH];
-	DWORD *pdwd = new DWORD[MAX_KEY_LENGTH]; //значение параметра попадет сюда
-	DWORD type; //тип параметра попадет сюда
-	DWORD datalen = MAX_KEY_LENGTH; //размер данных
-	DWORD cName = 4096;
-	DWORD cValue = 4096;
-	
-	removeHKRoot(fullPath);
 	HKEY key;
-	LRESULT result = RegOpenKeyEx(hKey, fullPath, 0, KEY_CREATE_SUB_KEY, &key);
-	if (result == ERROR_SUCCESS)
-	{
-		//читаем данные параметра
-		RegEnumValue(key, 0, oldName, &(cName = MAX_KEY_LENGTH), NULL, &type, (PBYTE)Value, &(cValue = MAX_KEY_LENGTH));
-		RegCloseKey(key);
-	}
-	//Удаляем старый параметр
+	HKEY keyToDel = openKey(fullPath);
 	
+	
+	//Удаляем старый параметр
 	if (!RegDeleteValue(keyToDel, oldName))
 		return NULL;
+
+	//создаем новый параметр newValue со значемнием value
+	removeHKRoot(fullPath);
+	LRESULT result = RegOpenKeyEx(hKey, fullPath, 0, KEY_SET_VALUE, &key);
+	RegSetValueEx(key, newName, 0, REG_SZ, Value, sizeof(Value));
 
 }
 
