@@ -4,14 +4,18 @@
 #include "definitions.h"
 
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
+LRESULT CALLBACK EditProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
 void setupWindow(HWND hWnd, HINSTANCE hInstance);
 
+HWND hWnd; //главное окно
 HWND regeditTreeView; //контрол для отображения дерева реестра
 HWND regeditListView; // контрол для отображения значений выбранной ветки
 HMENU mainMenu; //меню приложения
 HTREEITEM *root; //корневой элемент для TreeView
 СurrentItem currItem; //структура для хранения текущего узла дерева и элемента списка
 HWND *htvEdit = new HWND; // редактируемый узел дерева
+HWND lvEdit;
+WNDPROC wpRecordProc;
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
@@ -40,7 +44,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		return 1;
 	}
 	
-	HWND hWnd = CreateWindow(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, 1200, 900, NULL, NULL, hInstance, NULL);
+	hWnd = CreateWindow(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, 1200, 900, NULL, NULL, hInstance, NULL);
 	if (!hWnd)
 	{
 		MessageBox(NULL, _T("Call to CreateWindow failed!"), _T("regedit"), NULL);
@@ -177,6 +181,32 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				else
 					MessageBox(hWnd, L"Невозможно создать раздел", L"OK", MB_OK);
 			}
+			//------------------------------- РЕДАКТИРОВАНИЕ ИМЕНИ ПАРАМЕТРА --------------
+			if (LOWORD(wParam) == EDIT_PARAM)
+			{
+				*htvEdit = ListView_EditLabel(regeditListView, 0);
+			}
+			//------------------------------- РЕДАКТИРОВАНИЕ ЗНАЧЕНИЕ ПАРАМЕТРА --------------
+			if (LOWORD(wParam) == EDIT_PARAM_VALUE)
+			{
+				RECT *r1 = new RECT;
+				ListView_GetSubItemRect(regeditListView, currItem.currListItem, 2, LVIR_LABEL, r1);
+				int iCol = 2;
+				TCHAR pszText[MAX_KEY_LENGTH] = _T("");
+				ListView_GetItemText(regeditListView, currItem.currListItem, 2, pszText, MAX_KEY_LENGTH);
+				lvEdit = CreateWindowEx(0,
+					WC_EDIT,
+					pszText,
+					WS_VISIBLE | WS_CHILD | WS_BORDER,
+					r1->left + 416, r1->top + 5, r1->right - r1->left-1, r1->bottom - r1->top,
+					hWnd,
+					(HMENU)LV_EDIT,
+					(HINSTANCE)GetWindowLong(hWnd, GWL_HINSTANCE),
+					NULL);
+				wpRecordProc = (WNDPROC)SetWindowLong(lvEdit, GWL_WNDPROC, (LONG)EditProc);
+				SetFocus(lvEdit);
+				delete r1;
+			}
 			break;
 		}
 		case WM_CLOSE:
@@ -256,10 +286,32 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 						//ListView_GetItemText(regeditListView, currItem.currListItem, 0, pszText, MAX_KEY_LENGTH);
 
 					}
+					if (((LPNMHDR)lParam)->code == LVN_ENDLABELEDIT) //сохранение результатов редактирвоания
+					{
+						
+						//Получаем путь до текущего каталога
+						TCHAR fullPath[MAX_KEY_LENGTH] = _T("");
+						TCHAR oldName[MAX_KEY_LENGTH] = _T("");
+						TCHAR newName[MAX_KEY_LENGTH] = _T("");
+
+						GetFullPath(currItem.currTreeNode, root, regeditTreeView, fullPath);
+
+						//Получаем новое название параметра
+						GetWindowText(*htvEdit, newName, MAX_KEY_LENGTH);
+						ListView_GetItemText(regeditListView, currItem.currListItem, 0, oldName, MAX_KEY_LENGTH);
+						ListView_SetItemText(regeditListView, currItem.currListItem, 0, newName);
+
+						//Сохраняем новое название в реестре
+						renameParam(fullPath, oldName, newName);
+					}
 					break;
 				}
 			}
 			break;
+		}
+		case WM_KEYDOWN:
+		{
+
 		}
 		default:
 			return DefWindowProc(hWnd, message, wParam, lParam);
@@ -274,3 +326,38 @@ void setupWindow(HWND hWnd, HINSTANCE hInstance)
 	regeditListView = createRegeditListView(hWnd);
 	mainMenu = createMenu(hWnd);
 }
+
+
+LRESULT CALLBACK EditProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	switch (message)
+	{
+	case WM_KEYDOWN:
+	{
+		switch (wParam)
+		{
+		case VK_ESCAPE:
+		{
+			DestroyWindow(hwnd);
+			break;
+		}
+		case VK_RETURN:
+		{
+			TCHAR newLabelText[MAX_KEY_LENGTH] = _T("");
+			GetWindowText(lvEdit, newLabelText, MAX_KEY_LENGTH);
+			//Получаем путь до текущего каталога
+			TCHAR fullPath[MAX_KEY_LENGTH] = _T("");
+			GetFullPath(currItem.currTreeNode, root, regeditTreeView, fullPath);
+			//переименовываем параметр в списке
+			ListView_SetItemText(regeditListView, currItem.currListItem, 2, newLabelText);
+			//переименовываем параметр в реестре
+			//renameParam(fullPath, oldName, newLabelText);
+			DestroyWindow(hwnd);
+			break;
+		}
+		}
+	}
+	}
+	return CallWindowProc(wpRecordProc, hwnd, message, wParam, lParam);
+}
+

@@ -27,6 +27,8 @@
 #define DST_TREEVIEW	111
 #define DST_FILE		112
 #define ADD_PARAM		113 //Добавить параметр --
+#define EDIT_PARAM_VALUE 114 //Редактировать значение параметра
+#define LV_EDIT 115 //Редактировать значение параметра
 
 //коды веток реестра
 #define HKCR HKEY_CLASSES_ROOT
@@ -63,6 +65,7 @@ void enumKeys(HWND hListView, TCHAR fullPath[MAX_KEY_LENGTH]);//выводит список к
 LRESULT deleteParam(TCHAR fullPath[MAX_KEY_LENGTH], TCHAR keyName[MAX_KEY_LENGTH]);//удаляет параметр реестра
 LRESULT deleteBranch(TCHAR fullPath[MAX_KEY_LENGTH]);//удаляет ветку реестра
 LRESULT renameBranch(TCHAR fullPath[MAX_KEY_LENGTH], TCHAR newName[MAX_KEY_LENGTH]);
+LRESULT renameParam(TCHAR fullPath[MAX_KEY_LENGTH], TCHAR oldName[MAX_KEY_LENGTH], TCHAR newName[MAX_KEY_LENGTH]);
 LRESULT addBranch(TCHAR fullPath[MAX_KEY_LENGTH], TCHAR newBranchName[MAX_KEY_LENGTH]);
 TV_ITEM getCurrentItem(HWND hTreeView, HTREEITEM hItem); //получает текущий узел дерева
 HKEY dumpCatalog(HKEY hRootKey, HKEY hKey, TCHAR path[], HANDLE hFile); //сохранение указанного каталога в файл

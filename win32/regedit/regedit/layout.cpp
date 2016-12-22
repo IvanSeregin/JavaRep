@@ -24,7 +24,8 @@ HMENU createMenu(HWND hWnd)
 	AppendMenu(PopMenuEdit, MF_STRING | MF_POPUP, (UINT)PopMenuAddObject, L"Добавить");
 	AppendMenu(PopMenuEdit, MF_STRING | MF_POPUP, (UINT)PopMenuDelObject, L"Удалить");
 	AppendMenu(PopMenuEditObject, MF_STRING, EDIT_BRANCH, L"Переименовать папку");
-	AppendMenu(PopMenuEditObject, MF_STRING, EDIT_PARAM, L"Изменить имя и значение ключа");
+	AppendMenu(PopMenuEditObject, MF_STRING, EDIT_PARAM, L"Изменить имя параметра");
+	AppendMenu(PopMenuEditObject, MF_STRING, EDIT_PARAM_VALUE, L"Изменить значение параметра");
 	AppendMenu(PopMenuAddObject, MF_STRING, ADD_BRANCH, L"Добавить папку");
 	AppendMenu(PopMenuAddObject, MF_STRING, ADD_PARAM, L"Добавить ключ");
 	AppendMenu(PopMenuDelObject, MF_STRING, DEL_BRANCH, L"Удалить папку");
