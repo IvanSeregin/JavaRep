@@ -120,3 +120,38 @@ TV_ITEM getCurrentItem(HWND hTreeView, HTREEITEM hItem)
 	TreeView_GetItem(hTreeView, &item);
 	return item;
 }
+
+int regValueType(TCHAR type[TYPE_LENGTH])
+{
+	if (wcsstr(type, _T("REG_SZ")) != NULL)
+	{
+		return REG_SZ;
+	}
+	if (wcsstr(type, _T("REG_DWORD")) != NULL)
+	{
+		return REG_DWORD;
+	}
+	if (wcsstr(type, _T("REG_BINARY")) != NULL)
+	{
+		return REG_BINARY;
+	}
+
+	return REG_SZ;
+}
+
+unsigned int parseTcharToInt(TCHAR value[MAX_KEY_LENGTH])
+{
+	if (wcslen(value) == 0)	return -1;
+
+	TCHAR *nSub = wcsstr(value, L"(");
+	int nSubInt = nSub - value; //ищем значение в круглых скобах и переводим его в int
+	TCHAR numberInt[20];
+	int i = 0;
+	while (value[i + nSubInt+1] != L')')
+	{
+		numberInt[i] = value[i + nSubInt+1];
+		i++;
+	}
+	numberInt[i] = L'\0';
+	return _wtoi(numberInt);
+}

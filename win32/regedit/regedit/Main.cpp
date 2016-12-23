@@ -184,7 +184,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			//------------------------------- РЕДАКТИРОВАНИЕ ИМЕНИ ПАРАМЕТРА --------------
 			if (LOWORD(wParam) == EDIT_PARAM)
 			{
-				*htvEdit = ListView_EditLabel(regeditListView, 0); //шлется нотификация LVN_ENDLABELEDIT
+				*htvEdit = ListView_EditLabel(regeditListView, currItem.currListItem); //шлется нотификация LVN_ENDLABELEDIT
 			}
 			//------------------------------- РЕДАКТИРОВАНИЕ ЗНАЧЕНИЕ ПАРАМЕТРА --------------
 			if (LOWORD(wParam) == EDIT_PARAM_VALUE)
@@ -360,16 +360,24 @@ LRESULT CALLBACK EditProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		}
 		case VK_RETURN:
 		{
-			TCHAR newLabelText[MAX_KEY_LENGTH] = _T("");
-			GetWindowText(lvEdit, newLabelText, MAX_KEY_LENGTH);
-			//Получаем путь до текущего каталога
 			TCHAR fullPath[MAX_KEY_LENGTH] = _T("");
+			TCHAR oldName[MAX_KEY_LENGTH] = _T("");
+			TCHAR newName[MAX_KEY_LENGTH] = _T("");
+			TCHAR value[MAX_KEY_LENGTH] = _T("");
+			TCHAR type[TYPE_LENGTH] = _T("");
+			ListView_GetItemText(regeditListView, currItem.currListItem, 0, oldName, MAX_KEY_LENGTH);
+			ListView_GetItemText(regeditListView, currItem.currListItem, 1, type, TYPE_LENGTH);
+			//ListView_GetItemText(regeditListView, currItem.currListItem, 2, value, MAX_KEY_LENGTH);
+
+			GetWindowText(lvEdit, value, MAX_KEY_LENGTH);
+			//Получаем путь до текущего каталога
 			GetFullPath(currItem.currTreeNode, root, regeditTreeView, fullPath);
 			//переименовываем параметр в списке
-			ListView_SetItemText(regeditListView, currItem.currListItem, 2, newLabelText);
+			ListView_SetItemText(regeditListView, currItem.currListItem, 2, value);
 			//переименовываем параметр в реестре
-			//renameParam(fullPath, oldName, newLabelText);
 			DestroyWindow(hwnd);
+			//Сохраняем новое название в реестре
+			renameParam(fullPath, oldName, oldName, value, type);
 			break;
 		}
 		}

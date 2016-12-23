@@ -454,6 +454,7 @@ void enumKeys(HWND hListView, TCHAR fullPath[MAX_KEY_LENGTH]) //выводит список к
 					DWORD datalen = sizeof(pdwd);
 					RegQueryValueEx(key, Name, 0, &type, (BYTE*)(pdwd), &datalen);
 					wsprintf(Value, L"0x%08x (%d) ", *pdwd, *pdwd);
+					//wsprintf(Value, L"0x%08x", *pdwd);
 					insertRow(hListView, Name, _T("REG_DWORD"), Value);
 					delete pdwd;
 
@@ -508,23 +509,38 @@ LRESULT renameBranch(TCHAR fullPath[MAX_KEY_LENGTH], TCHAR newName[MAX_KEY_LENGT
 	return RegRenameKey(hKey, fullPath, newName);
 }
 
-LRESULT renameParam(TCHAR fullPath[MAX_KEY_LENGTH], TCHAR oldName[MAX_KEY_LENGTH], TCHAR newName[MAX_KEY_LENGTH], TCHAR Value[MAX_KEY_LENGTH])
+LRESULT renameParam(TCHAR fullPath[MAX_KEY_LENGTH], TCHAR oldName[MAX_KEY_LENGTH], TCHAR newName[MAX_KEY_LENGTH], TCHAR Value[MAX_KEY_LENGTH], TCHAR type[TYPE_LENGTH])
 {
 	//сохраняем данные параметра
 	HKEY hKey = determineHKEY(fullPath);
 	HKEY key;
 	HKEY keyToDel = openKey(fullPath);
 	
-	
 	//Удаляем старый параметр
-	if (!RegDeleteValue(keyToDel, oldName))
-		return NULL;
+	RegDeleteValue(keyToDel, oldName);
 
 	//создаем новый параметр newValue со значемнием value
 	removeHKRoot(fullPath);
+	//Открываем нужную ветку с сооветствующими правами
 	LRESULT result = RegOpenKeyEx(hKey, fullPath, 0, KEY_SET_VALUE, &key);
-	RegSetValueEx(key, newName, 0, REG_SZ, Value, sizeof(Value));
+	//Определяем тип параметра
+	int typeInt = regValueType(type);
+	if (typeInt == REG_SZ)
+	{
+		//записываем текстовый параметр
+		SHSetValue(hKey, fullPath, newName, typeInt, Value, wcslen(Value) * 2);
+	}
+	else if (typeInt == REG_DWORD)
+	{
+		//Записываем параметр типа dword
+		//парсим текст, берем из него значение в скобках и преобразуем в число
+		unsigned int v = parseTcharToInt(Value);
+		SHSetValue(hKey, fullPath, newName, typeInt, (BYTE*)&v, 4);
+	}
+	else if (typeInt == REG_BINARY)
+	{
 
+	}
 }
 
 LRESULT addBranch(TCHAR fullPath[MAX_KEY_LENGTH], TCHAR newBranchName[MAX_KEY_LENGTH])
