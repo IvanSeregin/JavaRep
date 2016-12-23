@@ -9,6 +9,8 @@
 #include <CommCtrl.h>
 #include <Shlobj.h>
 #include <Shlwapi.h>
+#include "SearchDialog.h"
+#include "resource.h"
 //константы
 #define MAX_KEY_LENGTH 4096
 #define MAX_VALUE_NAME 16383
@@ -28,11 +30,11 @@
 #define EDIT_PARAM		110 //Редактировать параметр +
 #define DST_TREEVIEW	111
 #define DST_FILE		112
-#define ADD_PARAM		113 //Добавить параметр --
+#define ADD_PARAM		113 //Добавить параметр +
 #define EDIT_PARAM_VALUE 114 //Редактировать значение параметра +
 #define LV_EDIT			115 //едит для измеения значения параметра
-#define ADD_REG_SZ		116 //Добавить текстовый параметр
-#define ADD_REG_DWORD	117 //Добавить dwrod параметр
+#define ADD_REG_SZ		116 //Добавить текстовый параметр+
+#define ADD_REG_DWORD	117 //Добавить dwrod параметр+
 
 //коды веток реестра
 #define HKCR HKEY_CLASSES_ROOT
@@ -76,8 +78,8 @@ HKEY dumpCatalog(HKEY hRootKey, HKEY hKey, TCHAR path[], HANDLE hFile); //сохран
 HKEY determineHKEY(TCHAR path[MAX_KEY_LENGTH]); // определяет ветку реестра по полному пути до каталога
 HTREEITEM insertInTreeView(HWND hWnd, HTREEITEM parent, TCHAR achKey[MAX_KEY_LENGTH]); //вставляет новый подкаталог в текущий каталог
 void insertRow(HWND hlistView, TCHAR name[MAX_KEY_LENGTH], TCHAR type[MAX_KEY_LENGTH], TCHAR value[MAX_KEY_LENGTH]); //вставляет новую строку в ListView
-HKEY openKey(TCHAR fullPath[MAX_KEY_LENGTH]);
-int regValueType(TCHAR type[TYPE_LENGTH]);
-unsigned int parseTcharToInt(TCHAR value[MAX_KEY_LENGTH]);
-
+HKEY openKey(TCHAR fullPath[MAX_KEY_LENGTH]);//открыть ветку
+int regValueType(TCHAR type[TYPE_LENGTH]);//определить тип параметра
+unsigned int parseTcharToInt(TCHAR value[MAX_KEY_LENGTH]);//перевод текста в целое число (для DWORD параметра типа 0x00000001 (1))
+void insertRow(HWND hlistView, TCHAR name[MAX_KEY_LENGTH], TCHAR type[MAX_KEY_LENGTH], TCHAR value[MAX_KEY_LENGTH]);// вставка новой записи в список
 #endif //_LAYOUT_H

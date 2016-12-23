@@ -9,6 +9,9 @@ HMENU createMenu(HWND hWnd)
 	HMENU PopMenuEdit = CreatePopupMenu();
 	HMENU PopMenuEditObject = CreatePopupMenu();
 	HMENU PopMenuAddObject = CreatePopupMenu();
+	HMENU PopMenuAddREG_SZ = CreatePopupMenu();
+	HMENU PopMenuAddREG_DWORD = CreatePopupMenu();
+	HMENU PopMenuAddParam = CreatePopupMenu();
 	HMENU PopMenuDelObject = CreatePopupMenu();
 
 	AppendMenu(mainMenu, MF_STRING | MF_POPUP, (UINT)PopMenuFile, L"&Файл");
@@ -27,7 +30,9 @@ HMENU createMenu(HWND hWnd)
 	AppendMenu(PopMenuEditObject, MF_STRING, EDIT_PARAM, L"Изменить имя параметра");
 	AppendMenu(PopMenuEditObject, MF_STRING, EDIT_PARAM_VALUE, L"Изменить значение параметра");
 	AppendMenu(PopMenuAddObject, MF_STRING, ADD_BRANCH, L"Добавить папку");
-	AppendMenu(PopMenuAddObject, MF_STRING, ADD_PARAM, L"Добавить ключ");
+	AppendMenu(PopMenuAddObject, MF_STRING | MF_POPUP, (UINT)PopMenuAddParam, L"Добавить параметр");
+	AppendMenu(PopMenuAddParam, MF_STRING, ADD_REG_SZ, L"Добавить REG_SZ параметр");
+	AppendMenu(PopMenuAddParam, MF_STRING, ADD_REG_DWORD, L"Добавить REG_DWORD параметр");
 	AppendMenu(PopMenuDelObject, MF_STRING, DEL_BRANCH, L"Удалить папку");
 	AppendMenu(PopMenuDelObject, MF_STRING, DEL_PARAM, L"Удалить ключ");
 

@@ -155,3 +155,25 @@ unsigned int parseTcharToInt(TCHAR value[MAX_KEY_LENGTH])
 	numberInt[i] = L'\0';
 	return _wtoi(numberInt);
 }
+
+void insertRow(HWND hlistView, TCHAR name[MAX_KEY_LENGTH], TCHAR type[MAX_KEY_LENGTH], TCHAR value[MAX_KEY_LENGTH])
+{
+	LV_ITEM lvitem;
+	lvitem.mask = LVIF_TEXT;
+	lvitem.iItem = SendMessage(hlistView, LVM_GETITEMCOUNT, 0, 0);
+	lvitem.iSubItem = 0;
+	if (wcslen(name) == 0)
+		lvitem.pszText = L"(По умолчанию)";
+	else
+		lvitem.pszText = name;
+	int iActualItem = SendMessage(hlistView, LVM_INSERTITEM, 0, (WPARAM)&lvitem);
+
+	lvitem.iItem = iActualItem;
+	lvitem.iSubItem = 1;
+	lvitem.pszText = type;
+	SendMessage(hlistView, LVM_SETITEM, 0, (WPARAM)&lvitem);
+
+	lvitem.iSubItem = 2;
+	lvitem.pszText = value;
+	SendMessage(hlistView, LVM_SETITEM, 0, (WPARAM)&lvitem);
+}

@@ -387,28 +387,6 @@ HKEY determineHKEY(TCHAR path[MAX_KEY_LENGTH])
 		return NULL;
 }
 
-void insertRow(HWND hlistView, TCHAR name[MAX_KEY_LENGTH], TCHAR type[MAX_KEY_LENGTH], TCHAR value[MAX_KEY_LENGTH])
-{
-	LV_ITEM lvitem;
-	lvitem.mask = LVIF_TEXT;
-	lvitem.iItem = SendMessage(hlistView, LVM_GETITEMCOUNT, 0, 0);
-	lvitem.iSubItem = 0;
-	if (wcslen(name) == 0)
-		lvitem.pszText = L"(ѕо умолчанию)";
-	else
-		lvitem.pszText = name;
-	int iActualItem = SendMessage(hlistView, LVM_INSERTITEM, 0, (WPARAM)&lvitem);
-	
-	lvitem.iItem = iActualItem;
-	lvitem.iSubItem = 1;
-	lvitem.pszText = type;
-	SendMessage(hlistView, LVM_SETITEM, 0, (WPARAM)&lvitem);
-	
-	lvitem.iSubItem = 2;
-	lvitem.pszText = value;
-	SendMessage(hlistView, LVM_SETITEM, 0, (WPARAM)&lvitem);
-}
-
 void enumKeys(HWND hListView, TCHAR fullPath[MAX_KEY_LENGTH]) //выводит список ключей и их параметров
 {
 	ListView_DeleteAllItems(hListView);
@@ -515,7 +493,7 @@ LRESULT renameParam(TCHAR fullPath[MAX_KEY_LENGTH], TCHAR oldName[MAX_KEY_LENGTH
 	HKEY hKey = determineHKEY(fullPath);
 	HKEY key;
 	HKEY keyToDel = openKey(fullPath);
-	
+
 	//”дал€ем старый параметр
 	RegDeleteValue(keyToDel, oldName);
 
@@ -528,19 +506,20 @@ LRESULT renameParam(TCHAR fullPath[MAX_KEY_LENGTH], TCHAR oldName[MAX_KEY_LENGTH
 	if (typeInt == REG_SZ)
 	{
 		//записываем текстовый параметр
-		SHSetValue(hKey, fullPath, newName, typeInt, Value, wcslen(Value) * 2);
+		result = SHSetValue(hKey, fullPath, newName, typeInt, Value, wcslen(Value) * 2);
 	}
 	else if (typeInt == REG_DWORD)
 	{
 		//«аписываем параметр типа dword
 		//парсим текст, берем из него значение в скобках и преобразуем в число
 		unsigned int v = parseTcharToInt(Value);
-		SHSetValue(hKey, fullPath, newName, typeInt, (BYTE*)&v, 4);
+		result = SHSetValue(hKey, fullPath, newName, typeInt, (BYTE*)&v, 4);
 	}
 	else if (typeInt == REG_BINARY)
 	{
 
 	}
+	return result;
 }
 
 LRESULT addBranch(TCHAR fullPath[MAX_KEY_LENGTH], TCHAR newBranchName[MAX_KEY_LENGTH])

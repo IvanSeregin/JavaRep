@@ -100,12 +100,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				dumBranch(fullPath); //вызов функции создания дампа
 			}
 			else
-			//------------------------------------ ПЕРЕИМЕНОВАНИЕ КАТАЛОГА -------------------------
-			if (LOWORD(wParam) == EDIT_BRANCH) //нажат пункт меню Редактировать каталог
-			{
-				*htvEdit = TreeView_EditLabel(regeditTreeView, currItem.currTreeNode);
-			}
-			else
 			//---------------------------------------------------- УДАЛЕНИЕ ПАРАМЕТРА --------------
 			if (LOWORD(wParam) == DEL_PARAM) //нажат пункт Удалить параметр
 			{
@@ -181,6 +175,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				else
 					MessageBox(hWnd, L"Невозможно создать раздел", L"OK", MB_OK);
 			}
+			//------------------------------------ ПЕРЕИМЕНОВАНИЕ КАТАЛОГА -------------------------
+			if (LOWORD(wParam) == EDIT_BRANCH) //нажат пункт меню Редактировать каталог
+			{
+				*htvEdit = TreeView_EditLabel(regeditTreeView, currItem.currTreeNode);
+			}
+			else
 			//------------------------------- РЕДАКТИРОВАНИЕ ИМЕНИ ПАРАМЕТРА --------------
 			if (LOWORD(wParam) == EDIT_PARAM)
 			{
@@ -219,6 +219,39 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				//Устанавливаем фокус
 				SetFocus(lvEdit);
 				delete r1;
+			}
+			else
+			//------------------------------- СОЗДАНИЕ ПАРАМЕТРА REG_SZ --------------
+			if (LOWORD(wParam) == ADD_REG_SZ)
+			{
+				TCHAR fullPath[MAX_KEY_LENGTH] = _T("");
+				GetFullPath(currItem.currTreeNode, root, regeditTreeView, fullPath);
+				if (renameParam(fullPath, L"Новый параметр", L"Новый параметр", L"Новое значение", L"REG_SZ") == ERROR_SUCCESS)
+				{
+					insertRow(regeditListView, L"Новый параметр", L"REG_SZ", L"Новое значение");
+				}
+				else
+					MessageBox(hWnd, L"Ошибка при создании нового параметра", L"Внимание!", MB_OK);
+			}
+			else
+			//------------------------------- СОЗДАНИЕ ПАРАМЕТРА DWORD --------------
+			if (LOWORD(wParam) == ADD_REG_DWORD)
+			{
+				TCHAR fullPath[MAX_KEY_LENGTH] = _T("");
+				GetFullPath(currItem.currTreeNode, root, regeditTreeView, fullPath);
+ 				if (renameParam(fullPath, L"Новый параметр", L"Новый параметр", L"0x00000000 (0)", L"REG_DWORD") == ERROR_SUCCESS)
+				{
+					insertRow(regeditListView, L"Новый параметр", L"REG_DWORD", L"0x00000000 (0)");
+				}
+				else
+					MessageBox(hWnd, L"Ошибка при создании нового параметра", L"Внимание!", MB_OK);
+
+			}
+			else
+			//------------------------------------- ПОИСК В РЕЕСТРЕ-----------------------
+			if (LOWORD(wParam) == FIND_FIND)
+			{
+				cretaeSearchDlg(GetModuleHandle(NULL), hWnd);
 			}
 			break;
 		}
@@ -386,3 +419,7 @@ LRESULT CALLBACK EditProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	return CallWindowProc(wpRecordProc, hwnd, message, wParam, lParam);
 }
 
+void search()
+{
+	
+}

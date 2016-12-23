@@ -146,19 +146,17 @@
   <ItemGroup>
     <ClInclude Include="definitions.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="SearchDialog.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="helpers.cpp" />
     <ClCompile Include="layout.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="regedit.cpp" />
+    <ClCompile Include="SearchDialog.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="regedit.rc" />
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="..\resources\folder_closed.bmp" />
-    <Image Include="..\resources\folder_opened.bmp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
