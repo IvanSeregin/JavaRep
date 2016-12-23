@@ -16,6 +16,7 @@ HTREEITEM *root; //корневой элемент для TreeView
 HWND *htvEdit = new HWND; // редактируемый узел дерева
 HWND lvEdit;
 WNDPROC wpRecordProc;
+HINSTANCE hInst;
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
@@ -23,6 +24,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	WNDCLASSEX wcex;
 	static TCHAR szWindowClass[] = _T("regedit");
 	static TCHAR szTitle[] = _T("regedit");
+	hInst = hInstance;
 	//htvEdit = NULL;
 	
 	wcex.cbSize = sizeof(WNDCLASSEX);
@@ -251,7 +253,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			//------------------------------------- ПОИСК В РЕЕСТРЕ-----------------------
 			if (LOWORD(wParam) == FIND_FIND)
 			{
-				cretaeSearchDlg(GetModuleHandle(NULL), hWnd);
+				cretaeSearchDlg(hInst, hWnd);
 			}
 			break;
 		}

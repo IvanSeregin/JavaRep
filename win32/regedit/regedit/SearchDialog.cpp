@@ -1,13 +1,14 @@
 #include "SearchDialog.h"
-BOOL CALLBACK DialogProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lParam);
+LRESULT CALLBACK DialogProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lParam);
+WNDPROC mainProc;
 HWND DlgWin;
 
 void cretaeSearchDlg(HINSTANCE hInstance, HWND hWnd)
 {
-	DialogBoxParam(hInstance, MAKEINTRESOURCE(IDD_DIALOG1), hWnd, DialogProc, 0);
+	DialogBoxParam(hInstance, MAKEINTRESOURCE(IDD_DIALOG1), hWnd, (DLGPROC)DialogProc, 0);
 	/*
-	DlgWin = CreateDialog(hInstance, MAKEINTRESOURCE(IDD_PROPPAGE_SMALL2), hWnd, (DLGPROC)DialogProc);
-	
+	DlgWin = CreateDialog(hInstance, MAKEINTRESOURCE(IDD_DIALOG1), hWnd, (DLGPROC)DialogProc);
+	mainProc = (WNDPROC)SetWindowLong(DlgWin, GWL_WNDPROC, (LONG)DialogProc);
 	ShowWindow(DlgWin, SW_SHOW);
 	MSG msg;
 	while (GetMessage(&msg, NULL, NULL, NULL))
@@ -21,7 +22,7 @@ void cretaeSearchDlg(HINSTANCE hInstance, HWND hWnd)
 	*/
 }
 
-BOOL CALLBACK DialogProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK DialogProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	switch (message)
 	{
@@ -31,8 +32,8 @@ BOOL CALLBACK DialogProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lPara
 	case WM_CLOSE:
 	{
 		EndDialog(hwndDlg, 0);
-		return true;
+		return 1;
 	}
 	}
-	return TRUE;
+	//return CallWindowProc(mainProc, hwndDlg, message, wParam, lParam);
 }
