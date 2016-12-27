@@ -1,39 +1,37 @@
 #include "SearchDialog.h"
-LRESULT CALLBACK DialogProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lParam);
-WNDPROC mainProc;
-HWND DlgWin;
+HWND mainWin;
+BOOL CALLBACK DialogProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lParam);
 
-void cretaeSearchDlg(HINSTANCE hInstance, HWND hWnd)
+int cretaeSearchDlg(HINSTANCE hInstance, HWND hWnd)
 {
+	mainWin = hWnd;
 	DialogBoxParam(hInstance, MAKEINTRESOURCE(IDD_DIALOG1), hWnd, (DLGPROC)DialogProc, 0);
-	/*
-	DlgWin = CreateDialog(hInstance, MAKEINTRESOURCE(IDD_DIALOG1), hWnd, (DLGPROC)DialogProc);
-	mainProc = (WNDPROC)SetWindowLong(DlgWin, GWL_WNDPROC, (LONG)DialogProc);
-	ShowWindow(DlgWin, SW_SHOW);
-	MSG msg;
-	while (GetMessage(&msg, NULL, NULL, NULL))
-	{
-		if (!IsWindow(DlgWin) || !IsDialogMessage(DlgWin, &msg))
-		{
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
-		}
-	}
-	*/
+	return 0;
 }
 
-LRESULT CALLBACK DialogProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lParam)
+BOOL CALLBACK DialogProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	switch (message)
 	{
-	case WM_PAINT:
-		return DefWindowProc(hwndDlg, message, wParam, lParam);
-		break;
-	case WM_CLOSE:
+	case WM_COMMAND:
 	{
-		EndDialog(hwndDlg, 0);
-		return 1;
+		if (LOWORD(wParam) == IDCANCEL)
+		{
+			EndDialog(hwndDlg, ERROR_SUCCESS);
+			return TRUE;
+		}
+		else
+		if (LOWORD(wParam) == IDOK)
+		{
+			HWND edit = GetDlgItem(hwndDlg, IDC_EDIT1);
+			TCHAR text[MAX_KEY_LENGTH] = L"";
+			GetWindowText(edit, text, MAX_KEY_LENGTH);
+			EndDialog(hwndDlg, ERROR_SUCCESS);
+			whatToSearch(text);			
+			return TRUE;
+		}
+		break;
 	}
 	}
-	//return CallWindowProc(mainProc, hwndDlg, message, wParam, lParam);
+	return FALSE;
 }

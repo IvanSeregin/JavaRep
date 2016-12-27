@@ -28,31 +28,32 @@ bool dumpRegistry()
 	//и вызываем функцию сохранения реестра dumpKey(). 
 	//Данная функция является рекурсивной!!!
 	TCHAR  path[MAX_KEY_LENGTH] = _T("");
-	WriteFile(hFile, "[HKEY_CLASSES_ROOT]\n", strlen("[HKEY_CLASSES_ROOT]\n"), NULL, NULL);
+	DWORD written = 0;
+	WriteFile(hFile, "[HKEY_CLASSES_ROOT]\n", strlen("[HKEY_CLASSES_ROOT]\n"), &written, NULL);
 	if (RegOpenKeyEx(HKCR,	path, 0, KEY_READ, &key) == ERROR_SUCCESS)
 	{
 		dumpCatalog(key, key, path, hFile);
 		RegCloseKey(key);
 	}
-	WriteFile(hFile, "[HKEY_CURRENT_USER]\n", strlen("[HKEY_CURRENT_USER]\n"), NULL, NULL);
+	WriteFile(hFile, "[HKEY_CURRENT_USER]\n", strlen("[HKEY_CURRENT_USER]\n"), &written, NULL);
 	if (RegOpenKeyEx(HKCU, path, 0, KEY_READ, &key) == ERROR_SUCCESS)
 	{
 		dumpCatalog(key, key, path, hFile);
 		RegCloseKey(key);
 	}
-	WriteFile(hFile, "[HKEY_LOCAL_MACHINE]\n", strlen("[HKEY_LOCAL_MACHINE]\n"), NULL, NULL);
+	WriteFile(hFile, "[HKEY_LOCAL_MACHINE]\n", strlen("[HKEY_LOCAL_MACHINE]\n"), &written, NULL);
 	if (RegOpenKeyEx(HKLM, path, 0, KEY_READ, &key) == ERROR_SUCCESS)
 	{
 		dumpCatalog(key, key, path, hFile);
 		RegCloseKey(key);
 	}
-	WriteFile(hFile, "[HKEY_USERS]\n", strlen("[HKEY_USERS]\n"), NULL, NULL);
+	WriteFile(hFile, "[HKEY_USERS]\n", strlen("[HKEY_USERS]\n"), &written, NULL);
 	if (RegOpenKeyEx(HKU, path, 0, KEY_READ, &key) == ERROR_SUCCESS)
 	{
 		dumpCatalog(key, key, path, hFile);
 		RegCloseKey(key);
 	}
-	WriteFile(hFile, "[HKEY_CURRENT_CONFIG]\n", strlen("[HKEY_CURRENT_CONFIG]\n"), NULL, NULL);
+	WriteFile(hFile, "[HKEY_CURRENT_CONFIG]\n", strlen("[HKEY_CURRENT_CONFIG]\n"), &written, NULL);
 	if (RegOpenKeyEx(HKCC, path, 0, KEY_READ, &key) == ERROR_SUCCESS)
 	{
 		dumpCatalog(key, key, path, hFile);
@@ -90,8 +91,9 @@ bool dumBranch(TCHAR path[MAX_KEY_LENGTH])
 	hkeyStr = removeHKRoot(path);
 	//записываем имя корневого каталога в файл
 	wcstombs(nm, hkeyStr, MAX_KEY_LENGTH);
-	WriteFile(hFile, nm, strlen(nm), NULL, NULL);
-	WriteFile(hFile, "\n", strlen("\n"), NULL, NULL);
+	DWORD written = 0;
+	WriteFile(hFile, nm, strlen(nm), &written, NULL);
+	WriteFile(hFile, "\n", strlen("\n"), &written, NULL);
 	delete[] hkeyStr;
 	//сохраняем ветку реестра в файл
 	if (RegOpenKeyEx(hRootKey, path, 0, KEY_READ, &key) == ERROR_SUCCESS)
@@ -118,7 +120,8 @@ HKEY dumpCatalog(HKEY hRootKey, HKEY hKey, TCHAR path[], HANDLE hFile)
 	DWORD    cchMaxValue;         
 	DWORD    cbMaxValueData;      
 	DWORD    cbSecurityDescriptor;
-	FILETIME ftLastWriteTime;     
+	FILETIME ftLastWriteTime;   
+	DWORD written = 0;
 
 	DWORD i, retCode;
 
@@ -154,9 +157,9 @@ HKEY dumpCatalog(HKEY hRootKey, HKEY hKey, TCHAR path[], HANDLE hFile)
 					char *ch = new char[MAX_KEY_LENGTH];
 					wcstombs(ch, tmpPath, MAX_KEY_LENGTH);
 
-					WriteFile(hFile, "[", strlen("["), NULL, NULL);
-					WriteFile(hFile, ch, strlen(ch), NULL, NULL);
-					WriteFile(hFile, "]\n", strlen("]\n"), NULL, NULL);
+					WriteFile(hFile, "[", strlen("["), &written, NULL);
+					WriteFile(hFile, ch, strlen(ch), &written, NULL);
+					WriteFile(hFile, "]\n", strlen("]\n"), &written, NULL);
 					
 					//---------------------------------------ПОЛУЧЕНИЕ КЛЮЧЕЙ В ТЕКУЩЕЙ ВЕТКЕ
 					//Далее читаем все ключи и их значения из текущей ветки реесра
@@ -203,14 +206,14 @@ HKEY dumpCatalog(HKEY hRootKey, HKEY hKey, TCHAR path[], HANDLE hFile)
 
 							//Записываем имя параметра в файл
 							if (strlen(nm) == 0)
-								WriteFile(hFile, "@", strlen("@"), NULL, NULL);
+								WriteFile(hFile, "@", strlen("@"), &written, NULL);
 							else
-								WriteFile(hFile, nm, strlen(nm), NULL, NULL);
+								WriteFile(hFile, nm, strlen(nm), &written, NULL);
 
 							//Записываем значение параметра в файл
-							WriteFile(hFile, "=", strlen("="), NULL, NULL);
-							WriteFile(hFile, vl, strlen(vl), NULL, NULL);
-							WriteFile(hFile, "\n", strlen("\n"), NULL, NULL);
+							WriteFile(hFile, "=", strlen("="), &written, NULL);
+							WriteFile(hFile, vl, strlen(vl), &written, NULL);
+							WriteFile(hFile, "\n", strlen("\n"), &written, NULL);
 
 							//Прибираемся в памяти
 							delete[] nm;
@@ -224,59 +227,13 @@ HKEY dumpCatalog(HKEY hRootKey, HKEY hKey, TCHAR path[], HANDLE hFile)
 					//Вызываем текущую функцию повторно, но уже для поиска подкаталогов текущего каталого
 					dumpCatalog(hRootKey, tmpKey, tmpPath, hFile);
 					RegCloseKey(tmpKey);
-					WriteFile(hFile, "\n", strlen("\n"), NULL, NULL);
+					WriteFile(hFile, "\n", strlen("\n"), &written, NULL);
 				}
 			}
 		}
 	}
 	
 	return NULL;
-}
-
-bool loadRegistry(HWND hWnd, HWND regeditTreeView, HTREEITEM *MyPC)
-{
-	
-	TV_INSERTSTRUCT tvinsert;
-	HTREEITEM hkeyItem;
-
-	tvinsert.hParent = NULL;
-	tvinsert.hInsertAfter = TVI_ROOT;
-	tvinsert.item.mask = TVIF_TEXT | TVIF_CHILDREN;
-	tvinsert.item.pszText = ROOT_ITEM_NAME;
-	*MyPC = (HTREEITEM)SendDlgItemMessage(hWnd, REG_TREE_VIEW, TVM_INSERTITEM, 0, (LPARAM)&tvinsert);
-	
-	tvinsert.hParent = *MyPC;
-	tvinsert.hInsertAfter = TVI_LAST;
-	tvinsert.item.pszText = L"HKEY_CLASSES_ROOT";
-	hkeyItem = (HTREEITEM)SendDlgItemMessage(hWnd, REG_TREE_VIEW, TVM_INSERTITEM, 0, (LPARAM)&tvinsert);
-
-	tvinsert.item.pszText = L"HKEY_CURRENT_USER";
-	hkeyItem = (HTREEITEM)SendDlgItemMessage(hWnd, REG_TREE_VIEW, TVM_INSERTITEM, 0, (LPARAM)&tvinsert);
-
-	tvinsert.item.pszText = L"HKEY_LOCAL_MACHINE";
-	hkeyItem = (HTREEITEM)SendDlgItemMessage(hWnd, REG_TREE_VIEW, TVM_INSERTITEM, 0, (LPARAM)&tvinsert);
-
-	tvinsert.item.pszText = L"HKEY_USERS";
-	hkeyItem = (HTREEITEM)SendDlgItemMessage(hWnd, REG_TREE_VIEW, TVM_INSERTITEM, 0, (LPARAM)&tvinsert);
-
-	tvinsert.item.pszText = L"HKEY_CURRENT_CONFIG";
-	hkeyItem = (HTREEITEM)SendDlgItemMessage(hWnd, REG_TREE_VIEW, TVM_INSERTITEM, 0, (LPARAM)&tvinsert);
-
-	TreeView_Expand(regeditTreeView, *MyPC, TVE_EXPAND);
-	
-	return true;
-}
-
-HTREEITEM insertInTreeView(HWND hWnd, HTREEITEM parent, TCHAR achKey[MAX_KEY_LENGTH])
-{
-	//Создание элемента в tree view
-	TV_INSERTSTRUCT tvinsert;
-	//parent.pszText;
-	tvinsert.hParent = parent;
-	tvinsert.hInsertAfter = TVI_LAST;
-	tvinsert.item.mask = TVIF_TEXT;// | TVIF_CHILDREN;
-	tvinsert.item.pszText = achKey;
-	return (HTREEITEM)SendDlgItemMessage(hWnd, REG_TREE_VIEW, TVM_INSERTITEM, 0, (LPARAM)&tvinsert);
 }
 
 void updateSubCatalogs(HWND hWnd, TV_ITEMW Parent, TCHAR fullPath[MAX_KEY_LENGTH]) //сканирует и добавляет каталоги к выбранному каталогу
@@ -359,35 +316,8 @@ void updateSubCatalogs(HWND hWnd, TV_ITEMW Parent, TCHAR fullPath[MAX_KEY_LENGTH
 		return; 
 	}
 }
-//функция возвращает указатель на корневой каталог по полученному пути
-//если строка не является валидным ключем реестра, то возвращается 0
-HKEY determineHKEY(TCHAR path[MAX_KEY_LENGTH])
-{
-	if (wcsstr(path, _T("HKEY_CLASSES_ROOT")) != NULL)
-	{	
-		return HKCR;
-	}
-	if (wcsstr(path, _T("HKEY_CURRENT_USER")) != NULL)
-	{
-		return HKCU;
-	} 
-	if (wcsstr(path, _T("HKEY_LOCAL_MACHINE")) != NULL)
-	{
-		return HKLM;
-	}
-	if (wcsstr(path, _T("HKEY_USERS")) != NULL)
-	{
-		return HKU;
-	}
-	if (wcsstr(path, _T("HKEY_CURRENT_CONFIG")) != NULL)
-	{
-		return HKCC;
-	}
-	else 
-		return NULL;
-}
 
-void enumKeys(HWND hListView, TCHAR fullPath[MAX_KEY_LENGTH]) //выводит список ключей и их параметров
+void enumKeys(HWND hListView, TCHAR fullPath[MAX_KEY_LENGTH]) //выводит список параметров и их значений
 {
 	ListView_DeleteAllItems(hListView);
 	TCHAR    achKey[MAX_KEY_LENGTH];   // буфер для подкаталогов
@@ -533,4 +463,170 @@ LRESULT addBranch(TCHAR fullPath[MAX_KEY_LENGTH], TCHAR newBranchName[MAX_KEY_LE
 		result = RegCreateKey(key, newBranchName, &hKey);
 	}
 	return result;
+}
+
+void search(TCHAR str[MAX_KEY_LENGTH], SearchResults *searchResults)
+{
+	
+}
+
+BOOL searchInReg(TCHAR str[MAX_KEY_LENGTH], SearchResults *searchResults, std::stack <TCHAR*> *tmpPath)
+{
+	_CrtMemState _ms;
+	_CrtMemCheckpoint(&_ms);
+
+	while (!searchResults->searchStack.empty())
+	{
+		TCHAR    achKey[MAX_KEY_LENGTH];   // буфер для подкаталогов
+		DWORD    cbName;
+		TCHAR    achClass[MAX_KEY_LENGTH] = L"";
+		DWORD    cchClassName = MAX_KEY_LENGTH;
+		DWORD    cSubKeys = 0;
+		DWORD    cbMaxSubKey;
+		DWORD    cchMaxClass;
+		DWORD    cValues;
+		DWORD    cchMaxValue;
+		DWORD    cbMaxValueData;
+		DWORD    cbSecurityDescriptor;
+		FILETIME ftLastWriteTime;
+
+		DWORD retCode;
+		TCHAR fullPath[MAX_KEY_LENGTH] = L"";
+		TCHAR *catalog;
+
+		//получаем следующий каталог для просмотра
+		catalog = searchResults->searchStack.top();
+		searchResults->searchStack.pop();
+		//ложим его в стэк пути
+		searchResults->path.push(catalog);
+		//получаем полный путь до текущего каталога
+		reconstructFullPath(*searchResults, fullPath);
+		//получаем указатель на корневой элемент реестра
+		HKEY hKey = determineHKEY(fullPath);
+		//удаляем из пути имя корневого элемента реестра
+		TCHAR *tmp = removeHKRoot(fullPath);
+		delete[] tmp;
+		HKEY tmpKey;
+		//открываем текущую ветку
+		if (RegOpenKeyEx(hKey, fullPath, 0, KEY_READ, &tmpKey) == ERROR_SUCCESS);
+		{
+			//проверяем текущую ветку на предмет наличия в ней искомой подстроки 
+			if (wcsstr(fullPath, str) != NULL)
+			{
+				*tmpPath = searchResults->path;
+				changeCounts(searchResults);
+				return SUBSTR_FOUND;
+			}
+			//проверяем параметры текущей ветки на предмет наличия в них искомой подстроки
+			int j = 0;
+			do
+			{
+				TCHAR Name[MAX_KEY_LENGTH]; //имя ключа
+				TCHAR Value[MAX_KEY_LENGTH]; //значение ключа
+				DWORD cName = 4096;
+				DWORD cValue = 4096;
+				DWORD type = 0;
+				retCode = RegEnumValue(tmpKey, j, Name, &(cName = MAX_KEY_LENGTH), NULL, &type, (PBYTE)Value, &(cValue = MAX_KEY_LENGTH));
+				if (type == REG_SZ)
+				{
+					if (wcsstr(Name, str) != NULL)
+					{
+						*tmpPath = searchResults->path;
+						changeCounts(searchResults);
+
+						//_CrtMemDumpAllObjectsSince(&_ms);
+						//_CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_FILE);
+						//_CrtSetReportFile(_CRT_WARN, _CRTDBG_FILE_STDOUT);
+						return SUBSTR_FOUND;
+					}
+				}
+				j++;
+			} while (retCode != ERROR_NO_MORE_ITEMS);
+
+			retCode = RegQueryInfoKey(tmpKey, achClass, &cchClassName, NULL, &cSubKeys, &cbMaxSubKey, &cchMaxClass, &cValues, &cchMaxValue, &cbMaxValueData, &cbSecurityDescriptor, &ftLastWriteTime);
+
+			//переходим к следующим веткам, если ничего не найдено
+			if (cSubKeys != 0)
+			{
+				std::stack <TCHAR*> searchStackTmp;
+				searchResults->count.push(cSubKeys);
+				for (int i = 0; i < cSubKeys; i++)
+				{
+					//заполняем стэк подветками текущей ветки
+					cbName = MAX_KEY_LENGTH;
+					retCode = RegEnumKeyEx(tmpKey, i, achKey, &cbName, NULL, NULL, NULL, &ftLastWriteTime);
+					TCHAR *p = new TCHAR[MAX_KEY_LENGTH];
+					wcscpy(p, achKey);
+					searchStackTmp.push(p);
+					//searchResults->searchStack.push(p);
+				}
+				
+				for (int i = 0; i < cSubKeys; i++)
+				{
+					searchResults->searchStack.push(searchStackTmp.top());
+					searchStackTmp.pop();
+				}
+			}
+			else
+			{
+				changeCounts(searchResults);
+			}
+		}
+	}
+	//_CrtMemDumpAllObjectsSince(&_ms);
+	//_CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_FILE);
+	//_CrtSetReportFile(_CRT_WARN, _CRTDBG_FILE_STDOUT);
+	return SUBSTR_NOT_FOUND;
+}
+
+
+void changeCounts(SearchResults *searchResults)
+{
+	//Удаляем верхний элемент стэка пути из стэка и памяти
+	//TCHAR *d = searchResults->path.top();
+	searchResults->path.pop();
+	//delete d;
+	//уменьшаем количество непросмотренных элементов на текущем уровне на 1
+	int t = searchResults->count.top();
+	t--;
+	searchResults->count.pop();
+	searchResults->count.push(t);
+	//если после уменьшения оказалось, что на текущем уровне не просмотрено 0 
+	//элементов (т.е. просмотрены все элементы)
+	//то уменьшаем количество непросмотренных элементов на уровень выше
+	//если после такого уменьшения непросмотренных элементов уровнем выше не осталось
+	//то повторяем операцию заново с более верхним уровнем и т.д.
+	while ((searchResults->count.top()) == 0)
+	{
+		searchResults->count.pop();
+		t = searchResults->count.top();
+		t--;
+		searchResults->count.pop();
+		searchResults->count.push(t);
+		//TCHAR *d = searchResults->path.top();
+		searchResults->path.pop();
+		//delete d;
+	}
+}
+//конструируем полный путь до текущей ветки по данным стэка
+void reconstructFullPath(SearchResults searchResults, TCHAR fullPath[MAX_KEY_LENGTH])
+{
+	//Делаем инверсию стэка чтобы был правильный путь
+	std::stack <TCHAR*> s;
+
+	while (!searchResults.path.empty())
+	{
+		TCHAR *str = searchResults.path.top();
+		s.push(str);
+		searchResults.path.pop();
+	}
+	//получаем путь до текущей ветки
+	TCHAR tmp[MAX_KEY_LENGTH];
+	while (!s.empty())
+	{
+		wcscpy(tmp, s.top());
+		wcscat(fullPath, tmp);
+		wcscat(fullPath, L"\\");
+		s.pop();
+	}
 }

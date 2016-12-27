@@ -9,12 +9,23 @@
 #include <CommCtrl.h>
 #include <Shlobj.h>
 #include <Shlwapi.h>
+#include <stack>
 #include "SearchDialog.h"
 #include "resource.h"
+
+//#ifdef _DEBUG
+#include <crtdbg.h>
+//#define _CRTDBG_MAP_ALLOC
+//#define new new( _NORMAL_BLOCK, __FILE__, __LINE__)
+//#endif
+
 //константы
-#define MAX_KEY_LENGTH 4096
-#define MAX_VALUE_NAME 16383
+#define MAX_KEY_LENGTH 512
+#define MAX_VALUE_NAME 512
 #define TYPE_LENGTH 20
+
+#define SUBSTR_FOUND TRUE
+#define SUBSTR_NOT_FOUND FALSE
 
 //коды контролов
 #define REG_TREE_VIEW	100
@@ -35,6 +46,7 @@
 #define LV_EDIT			115 //едит для измеения значения параметра
 #define ADD_REG_SZ		116 //Добавить текстовый параметр+
 #define ADD_REG_DWORD	117 //Добавить dwrod параметр+
+#define FIND_NEXT		118 //Найти далее +
 
 //коды веток реестра
 #define HKCR HKEY_CLASSES_ROOT
@@ -52,9 +64,17 @@
 struct СurrentItem
 {
 	HTREEITEM currTreeNode; //указатель на текущий элемент дерева
-	//LPNMITEMACTIVATE *currListItem = new LPNMITEMACTIVATE; //указатель на текущий элемент списка
 	int currListItem = -1;
 };
+
+struct SearchResults
+{
+	std::stack<TCHAR*> path;
+	std::stack<TCHAR*> searchStack;
+	std::stack <int> count;
+};
+
+
 
 HWND createRegeditTreeView(HWND hWnd, HINSTANCE hInstance);
 HWND createRegeditListView(HWND hWnd);
@@ -82,4 +102,11 @@ HKEY openKey(TCHAR fullPath[MAX_KEY_LENGTH]);//открыть ветку
 int regValueType(TCHAR type[TYPE_LENGTH]);//определить тип параметра
 unsigned int parseTcharToInt(TCHAR value[MAX_KEY_LENGTH]);//перевод текста в целое число (для DWORD параметра типа 0x00000001 (1))
 void insertRow(HWND hlistView, TCHAR name[MAX_KEY_LENGTH], TCHAR type[MAX_KEY_LENGTH], TCHAR value[MAX_KEY_LENGTH]);// вставка новой записи в список
-#endif //_LAYOUT_H
+void whatToSearch(TCHAR text[MAX_KEY_LENGTH], bool resumeSearch=false); //копирование текста для поиска
+void search(TCHAR str[MAX_KEY_LENGTH], SearchResults *searchResults);
+BOOL searchInReg(TCHAR str[MAX_KEY_LENGTH], SearchResults *searchResults, std::stack <TCHAR*> *tmp); //Поиск в реестре
+void initSearch(SearchResults *searchResults); //инициализация стэка поиска для нового поиска
+void reconstructFullPath(SearchResults searchResults, TCHAR fullPath[MAX_KEY_LENGTH]);//построение пути до объекта на основе стэка поиска
+void changeCounts(SearchResults *searchResults);
+
+#endif //LAYOUT_H

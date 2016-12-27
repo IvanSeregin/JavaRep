@@ -1,6 +1,3 @@
-//https://www.napishem.com/customer-248717.html
-
-
 #include "definitions.h"
 
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
@@ -13,10 +10,12 @@ HWND regeditListView; // контрол для отображения значений выбранной ветки
 HMENU mainMenu; //меню приложения
 HTREEITEM *root; //корневой элемент для TreeView
 СurrentItem currItem; //структура для хранения текущего узла дерева и элемента списка
+SearchResults *searchResults = new SearchResults;
 HWND *htvEdit = new HWND; // редактируемый узел дерева
 HWND lvEdit;
 WNDPROC wpRecordProc;
 HINSTANCE hInst;
+TCHAR whatToSearchStr[MAX_KEY_LENGTH] = _T("");
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
@@ -25,7 +24,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	static TCHAR szWindowClass[] = _T("regedit");
 	static TCHAR szTitle[] = _T("regedit");
 	hInst = hInstance;
-	//htvEdit = NULL;
 	
 	wcex.cbSize = sizeof(WNDCLASSEX);
 	wcex.style = CS_HREDRAW | CS_VREDRAW;
@@ -76,12 +74,16 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	switch (message)
 	{
 		case WM_PAINT:
+		{
 			return DefWindowProc(hWnd, message, wParam, lParam);
 			break;
+		}
 		case WM_DESTROY:
+		{
 			delete htvEdit;
 			PostQuitMessage(0);
 			break;
+		}
 		case WM_COMMAND: 
 		{
 			//---------------------------------------------------- ВЫХОД ---------------------------
@@ -255,6 +257,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			{
 				cretaeSearchDlg(hInst, hWnd);
 			}
+			else
+			//------------------------------------- НАЙТИ ДАЛЕЕ -----------------------
+			if (LOWORD(wParam) == FIND_NEXT)
+			{
+				whatToSearch(whatToSearchStr, true);
+			}
 			break;
 		}
 		case WM_CLOSE:
@@ -361,10 +369,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			}
 			break;
 		}
-		case WM_KEYDOWN:
-		{
-
-		}
 		default:
 			return DefWindowProc(hWnd, message, wParam, lParam);
 			break;
@@ -409,7 +413,7 @@ LRESULT CALLBACK EditProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			GetFullPath(currItem.currTreeNode, root, regeditTreeView, fullPath);
 			//переименовываем параметр в списке
 			ListView_SetItemText(regeditListView, currItem.currListItem, 2, value);
-			//переименовываем параметр в реестре
+			//удалем едит бокс
 			DestroyWindow(hwnd);
 			//Сохраняем новое название в реестре
 			renameParam(fullPath, oldName, oldName, value, type);
@@ -421,7 +425,67 @@ LRESULT CALLBACK EditProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	return CallWindowProc(wpRecordProc, hwnd, message, wParam, lParam);
 }
 
-void search()
+//функция подготавливает структуру SearchResults для поиска
+void whatToSearch(TCHAR strToSearch[MAX_KEY_LENGTH], bool resumeSearch)
 {
-	
+	if (!resumeSearch)
+	{
+		wcscpy(whatToSearchStr, strToSearch);
+		initSearch(searchResults);
+	}
+	std::stack <TCHAR*> tmp;
+	if (searchInReg(strToSearch, searchResults, &tmp))
+	{
+		//Разворачиваем элементы дерева по найденному пути, который находитя в SearchResults.path
+		//Создаем реверсивную копию стэка SearchResults.path
+		std::stack <TCHAR*> tmpRevers;
+		TCHAR *str;
+		TCHAR *pszText = new TCHAR[MAX_KEY_LENGTH];
+		while (!tmp.empty())
+		{
+			str = tmp.top();
+			tmpRevers.push(str);
+			tmp.pop();
+		}
+		
+		HTREEITEM tophItem;
+		HTREEITEM childHItem;
+		tophItem = TreeView_GetRoot(regeditTreeView);
+
+		while (!tmpRevers.empty())
+		{
+			str = tmpRevers.top();
+			tmpRevers.pop();
+			childHItem = TreeView_GetNextItem(regeditTreeView, tophItem, TVGN_CHILD);
+			while (childHItem != NULL)
+			{
+				TVITEM tmpTVItem = { 0 };
+
+				tmpTVItem.mask = TVIF_TEXT;
+				tmpTVItem.pszText = pszText;
+				tmpTVItem.cchTextMax = MAX_KEY_LENGTH;
+				tmpTVItem.hItem = childHItem;
+				TreeView_GetItem(regeditTreeView, &tmpTVItem);
+				if (wcsstr(tmpTVItem.pszText, str) && wcsstr(str, tmpTVItem.pszText))
+				{
+					TreeView_Expand(regeditTreeView, childHItem, TVE_EXPAND);
+					tophItem = childHItem;
+					break;
+				}
+				childHItem = TreeView_GetNextItem(regeditTreeView, childHItem, TVGN_NEXT);
+			}
+			//delete[] str;
+		}
+		SetFocus(regeditTreeView);
+		TreeView_Select(regeditTreeView, tophItem, TVGN_CARET);
+		TreeView_SetItemState(regeditTreeView, tophItem, TVIS_SELECTED, TVIS_SELECTED);
+		delete[] pszText;
+	}
+	else
+	{
+		MessageBox(hWnd, L"Строка не найдена!", L"Внимание!", 0);
+		//проводим инициализацию поисковой структуры
+		//с целью освобождения памяти и подготовки ее к новому поиску
+		initSearch(searchResults);
+	}
 }

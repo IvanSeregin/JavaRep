@@ -21,6 +21,7 @@ HMENU createMenu(HWND hWnd)
 
 	AppendMenu(mainMenu, MF_STRING | MF_POPUP, (UINT)PopMenuFind, L"&Поиск");
 	AppendMenu(PopMenuFind, MF_STRING, FIND_FIND, L"Найти");
+	AppendMenu(PopMenuFind, MF_STRING, FIND_NEXT, L"Найти далее");
 
 	AppendMenu(mainMenu, MF_STRING | MF_POPUP, (UINT)PopMenuEdit, L"&Редактирование");
 	AppendMenu(PopMenuEdit, MF_STRING | MF_POPUP, (UINT)PopMenuEditObject, L"Редактировать");

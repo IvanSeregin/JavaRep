@@ -177,3 +177,122 @@ void insertRow(HWND hlistView, TCHAR name[MAX_KEY_LENGTH], TCHAR type[MAX_KEY_LE
 	lvitem.pszText = value;
 	SendMessage(hlistView, LVM_SETITEM, 0, (WPARAM)&lvitem);
 }
+
+void initSearch(SearchResults *searchResults)
+{
+	TCHAR *d;
+	//Производим очистку стэков если это необходимо
+	while (!searchResults->searchStack.empty())
+	{
+		d = searchResults->searchStack.top();
+		delete d;
+		searchResults->searchStack.pop();
+	}
+
+	while (!searchResults->path.empty())
+	{
+		d = searchResults->path.top();
+		delete d;
+		searchResults->path.pop();
+	}
+	//инициализируем стэк поиска, создаем корневые элементы начиная с конца
+	searchResults->count.push(5);//5 корневых веток реестра
+	/*
+	TCHAR *hkcc = new TCHAR[30];
+	wcscpy(hkcc, L"HKEY_CURRENT_CONFIG");
+	searchResults->searchStack.push(hkcc);
+
+	TCHAR *hku = new TCHAR[30];
+	wcscpy(hku, L"HKEY_USERS");
+	searchResults->searchStack.push(hku);
+	
+
+	TCHAR *hkcm = new TCHAR[30];
+	wcscpy(hkcm, L"HKEY_LOCAL_MACHINE");
+	searchResults->searchStack.push(hkcm);
+	
+	*/
+	TCHAR *hkcu = new TCHAR[30];
+	wcscpy(hkcu, L"HKEY_CURRENT_USER");
+	searchResults->searchStack.push(hkcu);
+	/*
+	
+	TCHAR *hkcr = new TCHAR[30];
+	wcscpy(hkcr, L"HKEY_CLASSES_ROOT");
+	searchResults->searchStack.push(hkcr);
+	*/
+}
+
+HTREEITEM insertInTreeView(HWND hWnd, HTREEITEM parent, TCHAR achKey[MAX_KEY_LENGTH])
+{
+	//Создание элемента в tree view
+	TV_INSERTSTRUCT tvinsert;
+	//parent.pszText;
+	tvinsert.hParent = parent;
+	tvinsert.hInsertAfter = TVI_LAST;
+	tvinsert.item.mask = TVIF_TEXT;// | TVIF_CHILDREN;
+	tvinsert.item.pszText = achKey;
+	return (HTREEITEM)SendDlgItemMessage(hWnd, REG_TREE_VIEW, TVM_INSERTITEM, 0, (LPARAM)&tvinsert);
+}
+
+//функция возвращает указатель на корневой каталог по полученному пути
+//если строка не является валидным ключем реестра, то возвращается 0
+HKEY determineHKEY(TCHAR path[MAX_KEY_LENGTH])
+{
+	if (wcsstr(path, _T("HKEY_CLASSES_ROOT")) != NULL)
+	{
+		return HKCR;
+	}
+	if (wcsstr(path, _T("HKEY_CURRENT_USER")) != NULL)
+	{
+		return HKCU;
+	}
+	if (wcsstr(path, _T("HKEY_LOCAL_MACHINE")) != NULL)
+	{
+		return HKLM;
+	}
+	if (wcsstr(path, _T("HKEY_USERS")) != NULL)
+	{
+		return HKU;
+	}
+	if (wcsstr(path, _T("HKEY_CURRENT_CONFIG")) != NULL)
+	{
+		return HKCC;
+	}
+	else
+		return NULL;
+}
+
+bool loadRegistry(HWND hWnd, HWND regeditTreeView, HTREEITEM *MyPC)
+{
+
+	TV_INSERTSTRUCT tvinsert;
+	HTREEITEM hkeyItem;
+
+	tvinsert.hParent = NULL;
+	tvinsert.hInsertAfter = TVI_ROOT;
+	tvinsert.item.mask = TVIF_TEXT | TVIF_CHILDREN;
+	tvinsert.item.pszText = ROOT_ITEM_NAME;
+	*MyPC = (HTREEITEM)SendDlgItemMessage(hWnd, REG_TREE_VIEW, TVM_INSERTITEM, 0, (LPARAM)&tvinsert);
+
+	tvinsert.hParent = *MyPC;
+	tvinsert.hInsertAfter = TVI_LAST;
+	tvinsert.item.pszText = L"HKEY_CLASSES_ROOT";
+	hkeyItem = (HTREEITEM)SendDlgItemMessage(hWnd, REG_TREE_VIEW, TVM_INSERTITEM, 0, (LPARAM)&tvinsert);
+
+	tvinsert.item.pszText = L"HKEY_CURRENT_USER";
+	hkeyItem = (HTREEITEM)SendDlgItemMessage(hWnd, REG_TREE_VIEW, TVM_INSERTITEM, 0, (LPARAM)&tvinsert);
+
+	tvinsert.item.pszText = L"HKEY_LOCAL_MACHINE";
+	hkeyItem = (HTREEITEM)SendDlgItemMessage(hWnd, REG_TREE_VIEW, TVM_INSERTITEM, 0, (LPARAM)&tvinsert);
+
+	tvinsert.item.pszText = L"HKEY_USERS";
+	hkeyItem = (HTREEITEM)SendDlgItemMessage(hWnd, REG_TREE_VIEW, TVM_INSERTITEM, 0, (LPARAM)&tvinsert);
+
+	tvinsert.item.pszText = L"HKEY_CURRENT_CONFIG";
+	hkeyItem = (HTREEITEM)SendDlgItemMessage(hWnd, REG_TREE_VIEW, TVM_INSERTITEM, 0, (LPARAM)&tvinsert);
+
+	TreeView_Expand(regeditTreeView, *MyPC, TVE_EXPAND);
+
+	return true;
+}

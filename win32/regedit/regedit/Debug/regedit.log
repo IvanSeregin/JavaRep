@@ -1,3 +1,70 @@
 ﻿  SearchDialog.cpp
-d:\git\javarep\win32\regedit\regedit\searchdialog.cpp(39): warning C4715: 'DialogProc': not all control paths return a value
+  regedit.cpp
+d:\git\javarep\win32\regedit\regedit\regedit.cpp(15): warning C4996: 'wcscpy': This function or variable may be unsafe. Consider using wcscpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files\windows kits\10\include\10.0.10240.0\ucrt\corecrt_wstring.h(121): note: see declaration of 'wcscpy'
+d:\git\javarep\win32\regedit\regedit\regedit.cpp(78): warning C4996: 'wcscpy': This function or variable may be unsafe. Consider using wcscpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files\windows kits\10\include\10.0.10240.0\ucrt\corecrt_wstring.h(121): note: see declaration of 'wcscpy'
+d:\git\javarep\win32\regedit\regedit\regedit.cpp(93): warning C4996: 'wcstombs': This function or variable may be unsafe. Consider using wcstombs_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files\windows kits\10\include\10.0.10240.0\ucrt\stdlib.h(1008): note: see declaration of 'wcstombs'
+d:\git\javarep\win32\regedit\regedit\regedit.cpp(158): warning C4996: 'wcstombs': This function or variable may be unsafe. Consider using wcstombs_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files\windows kits\10\include\10.0.10240.0\ucrt\stdlib.h(1008): note: see declaration of 'wcstombs'
+d:\git\javarep\win32\regedit\regedit\regedit.cpp(190): warning C4996: 'wcstombs': This function or variable may be unsafe. Consider using wcstombs_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files\windows kits\10\include\10.0.10240.0\ucrt\stdlib.h(1008): note: see declaration of 'wcstombs'
+d:\git\javarep\win32\regedit\regedit\regedit.cpp(196): warning C4996: 'ultoa': The POSIX name for this item is deprecated. Instead, use the ISO C and C++ conformant name: _ultoa. See online help for details.
+  c:\program files\windows kits\10\include\10.0.10240.0\ucrt\stdlib.h(1338): note: see declaration of 'ultoa'
+d:\git\javarep\win32\regedit\regedit\regedit.cpp(200): warning C4996: 'wcstombs': This function or variable may be unsafe. Consider using wcstombs_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files\windows kits\10\include\10.0.10240.0\ucrt\stdlib.h(1008): note: see declaration of 'wcstombs'
+d:\git\javarep\win32\regedit\regedit\regedit.cpp(205): warning C4996: 'wcstombs': This function or variable may be unsafe. Consider using wcstombs_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files\windows kits\10\include\10.0.10240.0\ucrt\stdlib.h(1008): note: see declaration of 'wcstombs'
+d:\git\javarep\win32\regedit\regedit\regedit.cpp(295): warning C4018: '<': signed/unsigned mismatch
+d:\git\javarep\win32\regedit\regedit\regedit.cpp(331): warning C4101: 'cchMaxValue': unreferenced local variable
+d:\git\javarep\win32\regedit\regedit\regedit.cpp(330): warning C4101: 'cValues': unreferenced local variable
+d:\git\javarep\win32\regedit\regedit\regedit.cpp(323): warning C4101: 'achKey': unreferenced local variable
+d:\git\javarep\win32\regedit\regedit\regedit.cpp(334): warning C4101: 'ftLastWriteTime': unreferenced local variable
+d:\git\javarep\win32\regedit\regedit\regedit.cpp(329): warning C4101: 'cchMaxClass': unreferenced local variable
+d:\git\javarep\win32\regedit\regedit\regedit.cpp(332): warning C4101: 'cbMaxValueData': unreferenced local variable
+d:\git\javarep\win32\regedit\regedit\regedit.cpp(328): warning C4101: 'cbMaxSubKey': unreferenced local variable
+d:\git\javarep\win32\regedit\regedit\regedit.cpp(333): warning C4101: 'cbSecurityDescriptor': unreferenced local variable
+d:\git\javarep\win32\regedit\regedit\regedit.cpp(324): warning C4101: 'cbName': unreferenced local variable
+d:\git\javarep\win32\regedit\regedit\regedit.cpp(336): warning C4101: 'retCode': unreferenced local variable
+d:\git\javarep\win32\regedit\regedit\regedit.cpp(553): warning C4018: '<': signed/unsigned mismatch
+d:\git\javarep\win32\regedit\regedit\regedit.cpp(564): warning C4018: '<': signed/unsigned mismatch
+d:\git\javarep\win32\regedit\regedit\regedit.cpp(511): warning C4390: ';': empty controlled statement found; is this the intent?
+d:\git\javarep\win32\regedit\regedit\regedit.cpp(559): warning C4996: 'wcscpy': This function or variable may be unsafe. Consider using wcscpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files\windows kits\10\include\10.0.10240.0\ucrt\corecrt_wstring.h(121): note: see declaration of 'wcscpy'
+d:\git\javarep\win32\regedit\regedit\regedit.cpp(627): warning C4996: 'wcscpy': This function or variable may be unsafe. Consider using wcscpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files\windows kits\10\include\10.0.10240.0\ucrt\corecrt_wstring.h(121): note: see declaration of 'wcscpy'
+d:\git\javarep\win32\regedit\regedit\regedit.cpp(628): warning C4996: 'wcscat': This function or variable may be unsafe. Consider using wcscat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files\windows kits\10\include\10.0.10240.0\ucrt\corecrt_wstring.h(101): note: see declaration of 'wcscat'
+d:\git\javarep\win32\regedit\regedit\regedit.cpp(629): warning C4996: 'wcscat': This function or variable may be unsafe. Consider using wcscat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files\windows kits\10\include\10.0.10240.0\ucrt\corecrt_wstring.h(101): note: see declaration of 'wcscat'
+  Main.cpp
+d:\git\javarep\win32\regedit\regedit\main.cpp(34): warning C4302: 'type cast': truncation from 'LPWSTR' to 'WORD'
+d:\git\javarep\win32\regedit\regedit\main.cpp(39): warning C4302: 'type cast': truncation from 'LPWSTR' to 'WORD'
+d:\git\javarep\win32\regedit\regedit\main.cpp(325): warning C4996: 'wcscpy': This function or variable may be unsafe. Consider using wcscpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files\windows kits\10\include\10.0.10240.0\ucrt\corecrt_wstring.h(121): note: see declaration of 'wcscpy'
+d:\git\javarep\win32\regedit\regedit\main.cpp(433): warning C4996: 'wcscpy': This function or variable may be unsafe. Consider using wcscpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files\windows kits\10\include\10.0.10240.0\ucrt\corecrt_wstring.h(121): note: see declaration of 'wcscpy'
+  layout.cpp
+  helpers.cpp
+d:\git\javarep\win32\regedit\regedit\helpers.cpp(29): warning C4996: 'wcscpy': This function or variable may be unsafe. Consider using wcscpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files\windows kits\10\include\10.0.10240.0\ucrt\corecrt_wstring.h(121): note: see declaration of 'wcscpy'
+d:\git\javarep\win32\regedit\regedit\helpers.cpp(11): warning C4101: 'tmphItem': unreferenced local variable
+d:\git\javarep\win32\regedit\regedit\helpers.cpp(40): warning C4996: 'wcscpy': This function or variable may be unsafe. Consider using wcscpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files\windows kits\10\include\10.0.10240.0\ucrt\corecrt_wstring.h(121): note: see declaration of 'wcscpy'
+d:\git\javarep\win32\regedit\regedit\helpers.cpp(46): warning C4996: 'wcscpy': This function or variable may be unsafe. Consider using wcscpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files\windows kits\10\include\10.0.10240.0\ucrt\corecrt_wstring.h(121): note: see declaration of 'wcscpy'
+d:\git\javarep\win32\regedit\regedit\helpers.cpp(52): warning C4996: 'wcscpy': This function or variable may be unsafe. Consider using wcscpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files\windows kits\10\include\10.0.10240.0\ucrt\corecrt_wstring.h(121): note: see declaration of 'wcscpy'
+d:\git\javarep\win32\regedit\regedit\helpers.cpp(58): warning C4996: 'wcscpy': This function or variable may be unsafe. Consider using wcscpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files\windows kits\10\include\10.0.10240.0\ucrt\corecrt_wstring.h(121): note: see declaration of 'wcscpy'
+d:\git\javarep\win32\regedit\regedit\helpers.cpp(64): warning C4996: 'wcscpy': This function or variable may be unsafe. Consider using wcscpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files\windows kits\10\include\10.0.10240.0\ucrt\corecrt_wstring.h(121): note: see declaration of 'wcscpy'
+d:\git\javarep\win32\regedit\regedit\helpers.cpp(75): warning C4996: 'wcscpy': This function or variable may be unsafe. Consider using wcscpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files\windows kits\10\include\10.0.10240.0\ucrt\corecrt_wstring.h(121): note: see declaration of 'wcscpy'
+d:\git\javarep\win32\regedit\regedit\helpers.cpp(113): warning C4101: 'tmpoverlap': unreferenced local variable
+d:\git\javarep\win32\regedit\regedit\helpers.cpp(114): warning C4101: 'tmphItem': unreferenced local variable
+d:\git\javarep\win32\regedit\regedit\helpers.cpp(216): warning C4996: 'wcscpy': This function or variable may be unsafe. Consider using wcscpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files\windows kits\10\include\10.0.10240.0\ucrt\corecrt_wstring.h(121): note: see declaration of 'wcscpy'
+  Generating Code...
   regedit.vcxproj -> D:\git\JavaRep\win32\regedit\Debug\regedit.exe

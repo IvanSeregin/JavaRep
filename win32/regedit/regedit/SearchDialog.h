@@ -2,6 +2,6 @@
 #define SEARCHDIALOG_H
 
 #include "definitions.h"
-void cretaeSearchDlg(HINSTANCE hInstance, HWND hWnd);
+int cretaeSearchDlg(HINSTANCE hInstance, HWND hWnd);
 
 #endif // !SEARCHDIALOG_H
