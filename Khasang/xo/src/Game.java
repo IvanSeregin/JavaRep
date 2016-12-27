@@ -3,21 +3,56 @@
  */
 public class Game
 {
-    private Game game;
+    static Game instance;
     private Board board;
+    private Player playerX;
+    private Player playerO;
+
     private Game(){}
 
-    public Game init()
+    public void init()
     {
-        if (game == null)
+        System.out.println("Hello, " + playerX + " and " + playerO);
+    }
+
+    public static Game getInstance()
+    {
+        if (instance == null)
         {
-            game = new Game();
+            instance = new Game();
         }
-        return game;
+        return instance;
     }
 
     public void initWithBoard(Board board)
     {
         this.board = board;
+    }
+
+    public void getWinner()
+    {
+        System.out.println("Congrats!");
+    }
+
+    public void start()
+    {
+
+
+        while(!board.isFull())
+        {
+            while (!board.setPoint(playerX.turn()) && !board.isFull());
+            {
+            }
+            while (!board.setPoint(playerO.turn()) && !board.isFull());
+            {
+            }
+            board.show();
+        }
+    }
+
+    public void initWithPlayers(Player playerX, Player playerO)
+    {
+        this.playerO = playerO;
+        this.playerX = playerX;
     }
 }

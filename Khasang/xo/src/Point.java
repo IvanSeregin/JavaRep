@@ -6,7 +6,7 @@ public class Point
 {
     private int x;
     private int y;
-    private Status status;
+    private PointStatus status;
 
     public Point(){}
 
@@ -16,7 +16,7 @@ public class Point
         setY(y);
     }
 
-    public Point getRandomPoint()
+    public static Point getRandomPoint()
     {
         Random random = new Random();
         Point point = new Point(random.nextInt(3), random.nextInt(3));
@@ -49,13 +49,22 @@ public class Point
         return "X: " + x + "; Y: " + y;
     }
 
-    public Status getStatus()
-    {
-        return status;
-    }
-
-    public void setStatus(Status status)
+    public void setPointStatus(PointStatus status)
     {
         this.status = status;
+    }
+
+    public boolean isEmpty()
+    {
+        if (this.getPointStatus() == "_")
+        {
+            return true;
+        }
+        return false;
+    }
+
+    public String getPointStatus()
+    {
+        return status.getPointStatus();
     }
 }

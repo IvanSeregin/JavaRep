@@ -1,7 +1,7 @@
 /**
  * Created by ik34-admin on 27.12.2016.
  */
-public class Status
+public class PointStatus
 {
     final private String empty = "_";
     final private String X = "X";
@@ -9,17 +9,17 @@ public class Status
 
     private String status;
 
-    public Status()
+    public PointStatus(String status)
     {
-        this.status = empty;
+        this.status = status;
     }
 
-    public String getStatus()
+    public String getPointStatus()
     {
         return status;
     }
 
-    public void setStatus(String status)
+    public void setPointStatus(String status)
     {
         this.status = status;
     }
