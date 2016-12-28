@@ -1,5 +1,5 @@
 /**
- * Created by ik34-admin on 27.12.2016.
+ * Created by NortT on 27.12.2016.
  */
 import java.util.Random;
 public class Point
@@ -56,7 +56,7 @@ public class Point
 
     public boolean isEmpty()
     {
-        if (this.getPointStatus() == "_")
+        if (this.getPointStatus().equals("_"))
         {
             return true;
         }
