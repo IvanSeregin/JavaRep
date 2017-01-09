@@ -3,9 +3,12 @@
  */
 public class Board
 {
-    final int n=3;
+    final int n=3; //size of a board
     Point board[][];
 
+    /*
+    * This constructor initializes the board with empty points
+     */
     public Board()
     {
         board = new Point[n][n];
@@ -14,7 +17,7 @@ public class Board
         for(int i=0; i<n; i++)
             for (int j=0; j<n; j++)
             {
-                board[i][j] = pointFactory.createPoint(i, j, new PointStatus("_"));
+                board[i][j] = pointFactory.createPoint(i, j, PointStatus.EMPTY);
             }
     }
 
@@ -23,6 +26,10 @@ public class Board
         return n;
     }
 
+    /*
+    * The method return false if the board has empty point
+    * or true in other case
+    * */
     public boolean isFull()
     {
         for(int i=0; i<n; i++)
@@ -34,7 +41,7 @@ public class Board
 
     public boolean setPoint(Point point)
     {
-        if ((board[point.getX()][point.getY()].getPointStatus() == "_"))
+        if ((board[point.getX()][point.getY()].getPointStatus() == PointStatus.EMPTY))
         {
             board[point.getX()][point.getY()] = point;
             return true;
@@ -47,6 +54,11 @@ public class Board
         return board[x][y];
     }
 
+    /*
+    * The method determines whether the game has been ended or not
+    * If the game's ended, then a row, a column, or a diagonal consists of
+    * the same sign (X or O), or the board has no empty points
+     */
     public boolean isTheEnd()
     {
         int row = 0, cols = 0, mainDiag = 0, subDiag = 0;

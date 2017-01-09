@@ -4,6 +4,7 @@
 import java.util.Random;
 public class Point
 {
+
     private int x;
     private int y;
     private PointStatus status;
@@ -43,12 +44,6 @@ public class Point
         this.y = y;
     }
 
-    @Override
-    public String toString()
-    {
-        return "X: " + x + "; Y: " + y;
-    }
-
     public void setPointStatus(PointStatus status)
     {
         this.status = status;
@@ -56,15 +51,15 @@ public class Point
 
     public boolean isEmpty()
     {
-        if (this.getPointStatus().equals("_"))
+        if (this.status == PointStatus.EMPTY)
         {
             return true;
         }
         return false;
     }
 
-    public String getPointStatus()
+    public PointStatus getPointStatus()
     {
-        return status.getPointStatus();
+        return status;
     }
 }

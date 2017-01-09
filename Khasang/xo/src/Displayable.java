@@ -3,8 +3,9 @@
  */
 public interface Displayable
 {
-    void displayWinner(Game game);
     void displayBoard(Game game);
-    void readPlayerName();
+    Player readPlayerName(Player player);
     void showWinner(Player player);
+    void showWinner();
+    void greetPlayers(Player playerX, Player playerO);
 }

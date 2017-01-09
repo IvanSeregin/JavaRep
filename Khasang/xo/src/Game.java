@@ -19,21 +19,9 @@ public class Game
     public void init(Displayable display)
     {
         this.display = display;
-        try
-        {
-            BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-            System.out.println("Hello, X player! Write yur name, pls: ");
-            String name = br.readLine();
-            playerX.setName(name);
-            System.out.println("Hello, O player! Write yur name, pls: ");
-            name = br.readLine();
-            playerO.setName(name);
-            System.out.println("Hello, " + playerX + " and " + playerO);
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
+        playerX = display.readPlayerName(playerX);
+        playerO = display.readPlayerName(playerO);
+        display.greetPlayers(playerX, playerO);
     }
 
     public static Game getInstance()
@@ -50,19 +38,18 @@ public class Game
         this.board = board;
     }
 
-    public Player getWinner()
+    public void showWinner()
     {
-        //void showWinner(Player player);
         if(playerO.isWinner())
         {
-            return playerO;
+            display.showWinner(playerO);
         }
         if(playerX.isWinner())
         {
-            return playerX;
+            display.showWinner(playerX);
         }
-
-        return null;
+        else
+            display.showWinner();
     }
 
     public void start()
@@ -76,7 +63,7 @@ public class Game
                 if (board.isTheEnd())
                 {
                     playerX.setWinner(true);
-                    board.show();
+                    display.displayBoard(this);
                     return;
                 }
             }
@@ -86,12 +73,12 @@ public class Game
                 if (board.isTheEnd())
                 {
                     playerO.setWinner(true);
-                    board.show();
+                    display.displayBoard(this);
                     return;
                 }
             }
             //displayBoard;
-            board.show();
+            display.displayBoard(this);
         }
     }
 
