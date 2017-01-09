@@ -5,6 +5,13 @@ public class Player
 {
     String name;
     PointStatus sign;
+    boolean isWinner;
+
+    public Player(String name, PointStatus sign)
+    {
+        this.sign = sign;
+        this.name = name;
+    }
 
     public boolean isWinner()
     {
@@ -16,18 +23,11 @@ public class Player
         isWinner = winner;
     }
 
-    boolean isWinner;
-
     public Player(String name)
     {
         this.name = name;
     }
 
-    public Player(String name, PointStatus sign)
-    {
-        this.sign = sign;
-        this.name = name;
-    }
 
     public Point turn()
     {
