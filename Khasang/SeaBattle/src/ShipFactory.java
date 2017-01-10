@@ -6,10 +6,8 @@ import java.util.Random;
 public class ShipFactory {
     public Ship createShip(int size) {
         Random random = new Random();
-        //Coordinate coordinate = Coordinate.getRandom();
-        //Ship ship = new Ship(coordinate, random.nextBoolean());
-        Ship ship = new Ship(new Coordinate(6,8), true);
-        ship.setSize(size);
+        Coordinate coordinate = Coordinate.getRandom();
+        Ship ship = new Ship(size, coordinate, random.nextBoolean());
         return ship;
     }
 }

@@ -41,4 +41,13 @@ public class Coordinate {
         //System.out.println(randomX.nextInt(Consts.BOARD_WIDTH) + "  " + randomY.nextInt(Consts.BOARD_HEIHT));
         return new Coordinate(randomX.nextInt(Consts.BOARD_WIDTH), randomY.nextInt(Consts.BOARD_HEIGHT));
     }
+
+    public int toLinear() {
+        return this.x*Consts.BOARD_WIDTH + this.y;
+    }
+
+
+    public boolean isValid() {
+        return ((x>0 && x<Consts.BOARD_WIDTH) && (y>0 && y<Consts.BOARD_HEIGHT));
+    }
 }
