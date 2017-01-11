@@ -1,3 +1,5 @@
+import com.sun.xml.internal.bind.v2.runtime.reflect.opt.Const;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,20 +14,30 @@ public class Board {
         initBoard();
         //trying to create a 4-deck ship
         int count = 0;
-        ShipFactory shipFactory = new ShipFactory();
+
 
         //place 4-deck ships on the board
-        while (count != Consts.FOUR_DECK_COUNT){
-            Ship ship = shipFactory.createShip(Consts.FOUR_DECK_SIZE);
+
+        generateShip(Consts.FOUR_DECK_COUNT, Consts.FOUR_DECK_SIZE);
+        generateShip(Consts.THREE_DECK_COUNT, Consts.THREE_DECK_SIZE);
+        generateShip(Consts.TWO_DECK_COUNT, Consts.TWO_DECK_SIZE);
+        generateShip(Consts.ONE_DECK_COUNT, Consts.ONE_DECK_SIZE);
+    }
+
+    private void generateShip(int count, int size) {
+        int n = 0;
+        ShipFactory shipFactory = new ShipFactory();
+        while (n != count){
+            Ship ship = shipFactory.createShip(size);
             if (isFit(ship)){
                 fitShip(ship);
-                count ++;
+                n ++;
             }
         }
     }
 
     public Point getPoint(Coordinate coordinate){
-        return board.get(coordinate.getX()*Consts.BOARD_WIDTH + coordinate.getY());
+        return board.get(coordinate.getD()*Consts.BOARD_WIDTH + coordinate.getL());
     }
 
     private void initBoard() {
@@ -42,8 +54,8 @@ public class Board {
     position (horizontal or vertical)
      */
     private boolean isFit(Ship ship){
-        if (ship.isHorizontal()){
-            if(ship.getHead().getCoordinate().getX() <= Consts.BOARD_WIDTH - ship.getSize()){
+        if (ship.isVertical()){
+            if(ship.getHead().getCoordinate().getD() <= Consts.BOARD_WIDTH - ship.getSize()){
                 //If we here, then we can fit a ship
                 //Now we have to check if the place is free for a new ship
                 for (int i=0; i<ship.getSize(); i++){
@@ -67,7 +79,7 @@ public class Board {
             }
         }
         else{
-            if(ship.getHead().getCoordinate().getY() <= Consts.BOARD_HEIGHT -ship.getSize()){
+            if(ship.getHead().getCoordinate().getL() <= Consts.BOARD_HEIGHT -ship.getSize()){
                 //If we here, then we can fit a ship
                 //Now we have to check if the place is free for a new ship
                 for (int i=0; i<ship.getSize(); i++){
@@ -103,11 +115,11 @@ public class Board {
         for (int i=-1; i<=1; i++){
             for (int j=-1; j<=1; j++){
                 Coordinate coord = new Coordinate(
-                        point.getCoordinate().getX()+i,
-                        point.getCoordinate().getY()+j);
+                        point.getCoordinate().getD()+i,
+                        point.getCoordinate().getL()+j);
                 if (coord.isValid()) {
                     if (board.get(point.getCoordinate().toLinear()).getStatus() != PointStatus.EMPTY
-                            && board.get(point.getCoordinate().toLinear()).getStatus() != PointStatus.OREOL) {
+                            && board.get(point.getCoordinate().toLinear()).getStatus() != PointStatus.HALO) {
                         return false;
                     }
                 }
@@ -130,7 +142,30 @@ public class Board {
 
     //We use the method setHalo() to avoid two ships together
     private void setHalo(Ship ship) {
-        //TODO here
-    }
+        Coordinate shipHead = ship.getHead().getCoordinate();
+        if (!ship.isVertical()){
+            for (int i = shipHead.getD() - 1; i < shipHead.getD() + 2; i++){
+                for (int j = shipHead.getL() - 1; j < shipHead.getL() + ship.getSize() + 1; j++){
+                    Coordinate c = new Coordinate();
+                    c.setDL(i, j);
 
+                    if (c.isValid() && (board.get(c.toLinear()).getStatus() != PointStatus.UNDAMAGED_SHIP)){
+                        board.get(c.toLinear()).setStatus(PointStatus.HALO);
+                    }
+                }
+            }
+        }
+        else{
+            for (int j = shipHead.getL() - 1; j < shipHead.getL() + 2; j++){
+                for (int i = shipHead.getD() - 1; i < shipHead.getD() + ship.getSize() + 1; i++){
+                    Coordinate c = new Coordinate();
+                    c.setDL(i, j);
+
+                    if (c.isValid() && (board.get(c.toLinear()).getStatus() != PointStatus.UNDAMAGED_SHIP)){
+                        board.get(c.toLinear()).setStatus(PointStatus.HALO);
+                    }
+                }
+            }
+        }
+    }
 }

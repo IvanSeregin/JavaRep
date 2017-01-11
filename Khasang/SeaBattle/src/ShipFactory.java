@@ -8,6 +8,8 @@ public class ShipFactory {
         Random random = new Random();
         Coordinate coordinate = Coordinate.getRandom();
         Ship ship = new Ship(size, coordinate, random.nextBoolean());
+        //Coordinate c = new Coordinate(6,0);
+        //Ship ship = new Ship(size, c, true);
         return ship;
     }
 }

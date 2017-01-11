@@ -9,9 +9,11 @@ public class Main {
         Displayable display = new ConsoleDisplay();
 
         Board board1 = new Board();
+        //display.showBoardInDebugMode(board1);
         display.showBoard(board1);
 
         Board board2 = new Board();
+        display.showBoard(board2);
 
         player1.initWithBoard(board1);
         player2.initWithBoard(board2);

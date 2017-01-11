@@ -3,7 +3,7 @@
  */
 public enum PointStatus {
     EMPTY,
-    OREOL,
+    HALO,
     SINKED_SHIP,
     DAMAGED_SHIP,
     UNDAMAGED_SHIP;
@@ -13,7 +13,7 @@ public enum PointStatus {
     @Override
     public String toString(){
         if (this == EMPTY) return "_";
-        if (this == OREOL) return "O";
+        if (this == HALO) return "H";
         if (this == DAMAGED_SHIP) return "^";
         if (this == SINKED_SHIP) return "x";
         if (this == UNDAMAGED_SHIP) return "@";
