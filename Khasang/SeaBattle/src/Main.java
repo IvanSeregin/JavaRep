@@ -8,11 +8,12 @@ public class Main {
         Player player2 = new Player();
         Displayable display = new ConsoleDisplay();
 
-        Board board1 = new Board();
-        //display.showBoardInDebugMode(board1);
-        display.showBoard(board1);
+        display.readPlayers(player1, player2);
+        display.greetPlayers(player1, player2);
 
+        Board board1 = new Board();
         Board board2 = new Board();
+        display.showBoard(board1);
         display.showBoard(board2);
 
         player1.initWithBoard(board1);
@@ -20,5 +21,7 @@ public class Main {
 
         game.initWithDisplay(display);
         game.initWithPlayers(player1, player2);
+
+        game.start();
     }
 }

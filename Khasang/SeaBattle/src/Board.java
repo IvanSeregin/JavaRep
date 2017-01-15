@@ -1,5 +1,3 @@
-import com.sun.xml.internal.bind.v2.runtime.reflect.opt.Const;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,30 +14,38 @@ public class Board {
         int count = 0;
 
 
-        //place 4-deck ships on the board
-
-        generateShip(Consts.FOUR_DECK_COUNT, Consts.FOUR_DECK_SIZE);
-        generateShip(Consts.THREE_DECK_COUNT, Consts.THREE_DECK_SIZE);
-        generateShip(Consts.TWO_DECK_COUNT, Consts.TWO_DECK_SIZE);
-        generateShip(Consts.ONE_DECK_COUNT, Consts.ONE_DECK_SIZE);
+        //place n-deck ships on the board
+        placeShip(Consts.FOUR_DECK_COUNT, Consts.FOUR_DECK_SIZE);
+        placeShip(Consts.THREE_DECK_COUNT, Consts.THREE_DECK_SIZE);
+        placeShip(Consts.TWO_DECK_COUNT, Consts.TWO_DECK_SIZE);
+        placeShip(Consts.ONE_DECK_COUNT, Consts.ONE_DECK_SIZE);
     }
 
-    private void generateShip(int count, int size) {
+    /*
+    The method places *count* ships with specified size on the board.
+    ShipFactory creates a random ship, then if it's possible to place
+    the ship on the board (isFit() checks it), we call fitShip() to place the ship
+    and save ship to shipList, otherwise we create another ship with ShipFactory
+     */
+    private void placeShip(int count, int size) {
         int n = 0;
         ShipFactory shipFactory = new ShipFactory();
         while (n != count){
             Ship ship = shipFactory.createShip(size);
             if (isFit(ship)){
                 fitShip(ship);
+                shipList.add(ship);
                 n ++;
             }
         }
     }
 
+    //return specified point
     public Point getPoint(Coordinate coordinate){
         return board.get(coordinate.getD()*Consts.BOARD_WIDTH + coordinate.getL());
     }
 
+    //fill the board with empty points
     private void initBoard() {
         for (int i=0; i<Consts.BOARD_WIDTH; i++){
             for (int j = 0; j<Consts.BOARD_HEIGHT; j++){
@@ -103,15 +109,15 @@ public class Board {
         }
     }
 
+    /*The halo of a point consists of 8 points which surround the point
+    123
+    8*4
+    765
+    In this example * is the source point and points 12345678 are halo of the point
+    If the halo is an empty point or a halo of another ship, it's fine, we can place the
+     ship near the point
+ */
     private boolean isHaloSuitable(Point point) {
-        /*The halo of a point consists of 8 points which surround the point
-            123
-            8*4
-            765
-            In this example * is the source point and points 12345678 are halo of the point
-            If the halo is an empty point or a halo of another ship, it's fine, we can place the
-             ship near the point
-         */
         for (int i=-1; i<=1; i++){
             for (int j=-1; j<=1; j++){
                 Coordinate coord = new Coordinate(
@@ -128,19 +134,18 @@ public class Board {
         return true;
     }
 
+    //this method substitutes points of the board for points of the ship
+    //so when we shot and damage a ship these changes are reflected on the board and the ship
     private void fitShip(Ship ship) {
-        //this method substitutes points of the board for point of the ship
-        //so when we change (damage for example) a ship these changes are shown on the board
-        //and vice versa
         for (int i = 0; i<ship.getSize(); i++){
             Point point = ship.getPoint(i);
             this.board.set(point.getCoordinate().toLinear(), point);
         }
-
         setHalo(ship);
     }
 
-    //We use the method setHalo() to avoid two ships together
+    //We use the method setHalo() to set halo around specified ship.
+    //Halo helps to avoid two ships together
     private void setHalo(Ship ship) {
         Coordinate shipHead = ship.getHead().getCoordinate();
         if (!ship.isVertical()){
@@ -167,5 +172,19 @@ public class Board {
                 }
             }
         }
+    }
+
+    //Method finds a ship with a specified point in shipList
+    public Ship getShip(Point point){
+        Ship ship;
+        for (int i=0; i<Consts.SHIP_COUNT; i++){
+            ship = shipList.get(i);
+            for (int j=0; j<ship.getSize(); j++){
+                if (ship.getPoint(j) == point){
+                    return ship;
+                }
+            }
+        }
+        return null;
     }
 }

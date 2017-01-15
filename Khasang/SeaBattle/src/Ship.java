@@ -10,6 +10,11 @@ public class Ship {
     List<Point> ship = new ArrayList<>();
     private int size;
 
+    private enum ShipStatus{
+        UNDAMAGED,
+        DAMAGED,
+        SINKED
+    }
 
     public Ship(int size, Coordinate coordinate, boolean vertical){
         for (int i=0; i<size; i++){
@@ -45,5 +50,23 @@ public class Ship {
 
     public Point getHead() {
         return ship.get(0);
+    }
+
+    public boolean isSank() {
+        int damagedPointCount = 0;
+        for (int i=0; i<size; i++){
+            if (this.getPoint(i).getStatus() == PointStatus.DAMAGED_SHIP){
+                damagedPointCount++;
+            }
+        }
+
+        if (damagedPointCount == size){
+            for (int i=0; i<size; i++){
+                this.getPoint(i).setStatus(PointStatus.SANK_SHIP);
+            }
+            return true;
+        }
+
+        return  false;
     }
 }

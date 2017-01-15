@@ -26,7 +26,38 @@ public class Game {
     }
 
     public void start(){
-
+        //if there is no a winner yet players shoot
+        //if a player damages a ship, then he/she has the right to shoot again
+        while (!player1.isWinner() && !player2.isWinner()) {
+            nextTurn(player1);
+            if (!player1.isWinner()) {
+                nextTurn(player2);
+            }
+            //pause(500);
+        }
+        //check who is a winner
+        if (player1.isWinner()){
+            display.showWinner(player1);
+        }
+        else{
+            display.showWinner(player2);
+        }
     }
 
+    private void pause(int i) {
+        try {
+            Thread.sleep(i);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void nextTurn(Player player){
+        display.whoIsNext(player);
+
+        while (player.shoot() && !player.isWinner()) {
+            display.showBoard(player.getBoard());
+        }
+        display.showBoard(player.getBoard());
+    }
 }

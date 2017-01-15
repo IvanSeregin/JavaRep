@@ -4,10 +4,10 @@
 public enum PointStatus {
     EMPTY,
     HALO,
-    SINKED_SHIP,
+    SANK_SHIP,
     DAMAGED_SHIP,
-    UNDAMAGED_SHIP;
-
+    UNDAMAGED_SHIP,
+    MISSED;
 
 
     @Override
@@ -15,8 +15,9 @@ public enum PointStatus {
         if (this == EMPTY) return "_";
         if (this == HALO) return "H";
         if (this == DAMAGED_SHIP) return "^";
-        if (this == SINKED_SHIP) return "x";
+        if (this == SANK_SHIP) return "x";
         if (this == UNDAMAGED_SHIP) return "@";
+        if (this == MISSED) return "~";
         return "?";
     }
 }

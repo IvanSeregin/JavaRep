@@ -1,16 +1,35 @@
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
 /**
  * Created by ik34-admin on 09.01.2017.
  */
 public class ConsoleDisplay implements Displayable {
 
     @Override
-    public void readPlayers() {
+    public void readPlayers(Player player1, Player player2) {
+        try
+        {
+            BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+            System.out.println("Hello, write yur name, pls: ");
+            String name = br.readLine();
+            player1.setName(name);
 
+            System.out.println("Hello, write yur name, pls: ");
+            name = br.readLine();
+            player2.setName(name);
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
     }
 
     @Override
-    public void greetPlayers() {
-
+    public void greetPlayers(Player player1, Player player2) {
+        System.out.println(player1.getName() + ", hi there!");
+        System.out.println("Hey " + player2.getName() + " g'luck!");
     }
 
     @Override
@@ -29,7 +48,10 @@ public class ConsoleDisplay implements Displayable {
                 Coordinate coordinate = new Coordinate();
                 coordinate.setDL(i, j);
                 PointStatus status = board.getPoint(coordinate).getStatus();
-                if (status == PointStatus.EMPTY || status == PointStatus.DAMAGED_SHIP || status == PointStatus.SINKED_SHIP)
+                if (status == PointStatus.EMPTY ||
+                        status == PointStatus.DAMAGED_SHIP ||
+                        status == PointStatus.SANK_SHIP ||
+                        status == PointStatus.MISSED)
                     System.out.print(board.getPoint(coordinate).getStatus() + "  ");
                 else
                     System.out.print(PointStatus.EMPTY + "  ");
@@ -60,5 +82,15 @@ public class ConsoleDisplay implements Displayable {
             }
             System.out.println();
         }
+    }
+
+    @Override
+    public  void whoIsNext(Player player){
+        System.out.println("Now it's " + player.getName() + "'s turn");
+    }
+
+    @Override
+    public  void showWinner(Player player){
+        System.out.println("Congrats " + player.getName() + ". You won!");
     }
 }
