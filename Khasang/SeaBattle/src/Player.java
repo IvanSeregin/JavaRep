@@ -2,9 +2,19 @@
  * Created by ik34-admin on 09.01.2017.
  */
 public class Player {
+    private enum PlayerStatus{
+        HUMAN,
+        PC
+    }
+
     private Board board;
     private Integer sinkCount = 0;
     private String name = "Bond";
+    private PlayerStatus status;
+
+    public Player() {
+        status = PlayerStatus.PC;
+    }
 
     public void initWithBoard(Board board) {
         this.board = board;

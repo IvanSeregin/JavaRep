@@ -1,12 +1,17 @@
+import java.util.LinkedList;
+
 /**
  * Created by ik34-admin on 09.01.2017.
  */
 public class Main {
     public static void main(String[] args) {
+
         Game game = Game.getInstance();
+
+        Displayable display = new ConsoleDisplay();
+
         Player player1 = new Player();
         Player player2 = new Player();
-        Displayable display = new ConsoleDisplay();
 
         display.readPlayers(player1, player2);
         display.greetPlayers(player1, player2);
