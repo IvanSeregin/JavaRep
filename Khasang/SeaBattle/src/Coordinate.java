@@ -49,4 +49,9 @@ public class Coordinate {
     public boolean isValid() {
         return ((d >= 0 && d <Consts.BOARD_WIDTH) && (l >= 0 && l <Consts.BOARD_HEIGHT));
     }
+
+    @Override
+    public String toString(){
+        return d + " " + l;
+    }
 }

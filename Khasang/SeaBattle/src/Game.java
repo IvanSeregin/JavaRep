@@ -42,6 +42,9 @@ public class Game {
         else{
             display.showWinner(player2);
         }
+
+        //display.showBoardInDebugMode(player1.getBoard());
+        //display.showBoardInDebugMode(player2.getBoard());
     }
 
     private void pause(int i) {

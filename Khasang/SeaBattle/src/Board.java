@@ -10,15 +10,22 @@ public class Board {
 
     public Board(){
         initBoard();
-        //trying to create a 4-deck ship
-        int count = 0;
-
 
         //place n-deck ships on the board
         placeShip(Consts.FOUR_DECK_COUNT, Consts.FOUR_DECK_SIZE);
         placeShip(Consts.THREE_DECK_COUNT, Consts.THREE_DECK_SIZE);
         placeShip(Consts.TWO_DECK_COUNT, Consts.TWO_DECK_SIZE);
         placeShip(Consts.ONE_DECK_COUNT, Consts.ONE_DECK_SIZE);
+
+        clearHalo();
+    }
+
+    private void clearHalo() {
+        for (int i = 0; i<board.size(); i++){
+            if (board.get(i).getStatus() == PointStatus.HALO){
+                board.get(i).setStatus(PointStatus.EMPTY);
+            }
+        }
     }
 
     /*
@@ -146,7 +153,7 @@ public class Board {
 
     //We use the method setHalo() to set halo around specified ship.
     //Halo helps to avoid two ships together
-    private void setHalo(Ship ship) {
+    public void setHalo(Ship ship) {
         Coordinate shipHead = ship.getHead().getCoordinate();
         if (!ship.isVertical()){
             for (int i = shipHead.getD() - 1; i < shipHead.getD() + 2; i++){
@@ -154,7 +161,10 @@ public class Board {
                     Coordinate c = new Coordinate();
                     c.setDL(i, j);
 
-                    if (c.isValid() && (board.get(c.toLinear()).getStatus() != PointStatus.UNDAMAGED_SHIP)){
+                    if (c.isValid() && (board.get(c.toLinear()).getStatus() != PointStatus.UNDAMAGED_SHIP) &&
+                            (board.get(c.toLinear()).getStatus() != PointStatus.MISSED ) &&
+                            (board.get(c.toLinear()).getStatus() != PointStatus.DAMAGED_SHIP)&&
+                            (board.get(c.toLinear()).getStatus() != PointStatus.SANK_SHIP)){
                         board.get(c.toLinear()).setStatus(PointStatus.HALO);
                     }
                 }
@@ -166,7 +176,10 @@ public class Board {
                     Coordinate c = new Coordinate();
                     c.setDL(i, j);
 
-                    if (c.isValid() && (board.get(c.toLinear()).getStatus() != PointStatus.UNDAMAGED_SHIP)){
+                    if (c.isValid() && (board.get(c.toLinear()).getStatus() != PointStatus.UNDAMAGED_SHIP) &&
+                            (board.get(c.toLinear()).getStatus() != PointStatus.MISSED ) &&
+                            (board.get(c.toLinear()).getStatus() != PointStatus.DAMAGED_SHIP)&&
+                            (board.get(c.toLinear()).getStatus() != PointStatus.SANK_SHIP)){
                         board.get(c.toLinear()).setStatus(PointStatus.HALO);
                     }
                 }

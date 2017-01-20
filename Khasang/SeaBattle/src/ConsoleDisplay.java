@@ -75,10 +75,13 @@ public class ConsoleDisplay implements Displayable {
             for (int j = 0; j<Consts.BOARD_HEIGHT; j++){
                 Coordinate coordinate = new Coordinate();
                 coordinate.setDL(i, j);
+                /*
                 if (board.getPoint(coordinate).getStatus() == PointStatus.UNDAMAGED_SHIP)
                     System.out.print(board.getPoint(coordinate).getStatus() + "  ");
                 else
                     System.out.print(PointStatus.EMPTY + "  ");
+                */
+                System.out.print(board.getPoint(coordinate).getStatus() + "  ");
             }
             System.out.println();
         }
@@ -92,5 +95,10 @@ public class ConsoleDisplay implements Displayable {
     @Override
     public  void showWinner(Player player){
         System.out.println("Congrats " + player.getName() + ". You won!");
+    }
+
+    @Override
+    public void debugMessage(String message) {
+        System.out.println(message);
     }
 }

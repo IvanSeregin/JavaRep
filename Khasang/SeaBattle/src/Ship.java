@@ -52,6 +52,8 @@ public class Ship {
         return ship.get(0);
     }
 
+    //The method checks whether a ship sank and if ti's so
+    //changes the status of the points to SANK_SHIP
     public boolean isSank() {
         int damagedPointCount = 0;
         for (int i=0; i<size; i++){

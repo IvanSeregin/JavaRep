@@ -1,5 +1,3 @@
-import java.util.LinkedList;
-
 /**
  * Created by ik34-admin on 09.01.2017.
  */
@@ -21,8 +19,8 @@ public class Main {
         display.showBoard(board1);
         display.showBoard(board2);
 
-        player1.initWithBoard(board1);
-        player2.initWithBoard(board2);
+        player1.initWithBoard(board2);
+        player2.initWithBoard(board1);
 
         game.initWithDisplay(display);
         game.initWithPlayers(player1, player2);

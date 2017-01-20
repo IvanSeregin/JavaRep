@@ -8,4 +8,5 @@ public interface Displayable {
     void showBoardInDebugMode(Board board); //This is for debug purposes only
     void whoIsNext(Player player);
     void showWinner(Player player);
+    void debugMessage(String message);
 }
