@@ -62,14 +62,11 @@ public class ConsoleDisplay implements Displayable {
 
     @Override
     public void showBoardInDebugMode(Board board) {
-        System.out.println("    A  B  C  D  E  F  G  H  I  J");
+        System.out.println("   0  1  2  3  4  5  6  7  8  9");
 
         for (int i=0; i<Consts.BOARD_WIDTH; i++){
             //Let's make it look beautiful :)
-            if (i+1 < 10)
-                System.out.print(" " + (i+1) + "  ");
-            else
-                System.out.print(i+1 + "  ");
+            System.out.print(i + "  ");
 
             //Show every singe point in board
             for (int j = 0; j<Consts.BOARD_HEIGHT; j++){
@@ -89,7 +86,7 @@ public class ConsoleDisplay implements Displayable {
 
     @Override
     public  void whoIsNext(Player player){
-        System.out.println("Now it's " + player.getName() + "'s turn");
+        System.out.println("\nNow it's " + player.getName() + "'s turn");
     }
 
     @Override
