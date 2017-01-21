@@ -42,7 +42,7 @@ public class Player {
         /*
         This method is called when the position of the ship is not known yet.
         The method returns points lying around the last damaged point.
-         The Direction of checking is the following: left - top - right - bottom.
+        The Direction of checking is the following: left - top - right - bottom.
 
          */
         private Coordinate findNextPoint(){
