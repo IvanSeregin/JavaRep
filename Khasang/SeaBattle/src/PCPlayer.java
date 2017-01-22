@@ -1,17 +1,20 @@
+import java.util.Random;
+
 /**
  * Created by ik34-admin on 09.01.2017.
  */
-public class Player {
-    private enum PlayerStatus{
-        HUMAN,
-        PC
-    }
-
+public class PCPlayer extends AbstractPlayer{
     private enum ShipPosition{
         VERTICAL,
         HORIZONTAL,
         NONE
     }
+
+    private CurrentShip currentShip = new CurrentShip();
+    private Coordinate lastOptimalShot;
+    private Coordinate firstInColumnOptimalShot;
+    private boolean is4DeckAlive = true;
+    Integer offset = 4;
 
     private class CurrentShip{
         public Ship ship;
@@ -154,44 +157,12 @@ public class Player {
         }
     }
 
-    private Board board;
-    private Integer sinkCount = 0;
-    private String name = "Bond"; //default name
-    private PlayerStatus status;
-    CurrentShip currentShip = new CurrentShip();
-
-
-    public Player() {
-        status = PlayerStatus.PC;
-    }
-
-    public void initWithBoard(Board board) {
-        this.board = board;
-    }
-
-    public boolean isWinner() {
-        if (sinkCount == Consts.SHIP_COUNT)
-            return true;
-        return false;
-    }
-
-    public Board getBoard() {
-        return board;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
     /*
     This method return true if a player damaged a ship
     If a ship has been sank, then we increment the number of sank ships
     */
-    public boolean  shoot(){
+    @Override
+    public boolean shoot(){
         Coordinate coordinate;
         if (currentShip.ship == null){
             /*
@@ -200,7 +171,8 @@ public class Player {
             then we ne to update coordinate
             */
             do {
-                coordinate = Coordinate.getRandom();
+                //coordinate = Coordinate.getRandom();
+                coordinate = getNextOptimalShot();
             } while (board.getPoint(coordinate).getStatus() == PointStatus.SANK_SHIP ||
                     board.getPoint(coordinate).getStatus() == PointStatus.DAMAGED_SHIP ||
                     board.getPoint(coordinate).getStatus() == PointStatus.MISSED ||
@@ -263,6 +235,13 @@ public class Player {
             }
             if (currentShip.ship.isSank()){
                 sinkCount++;
+                if (currentShip.ship.getSize() == 4){
+                    is4DeckAlive = false;
+                    offset = 3;
+                    lastOptimalShot = null;
+                    firstInColumnOptimalShot = null;
+                }
+
                 board.setHalo(currentShip.ship);
                 currentShip = new CurrentShip();
             }
@@ -278,5 +257,38 @@ public class Player {
             board.getPoint(coordinate).setStatus(PointStatus.MISSED);
         }
         return false;
+    }
+    //35 31 39 28 37 31 16 - without optimal shooting
+    //27 34 26 26 28 41 34 40 36 (292)- 1st version of getNextOptimalShot
+    //31 34 26 30 29 40 28 37 31 (286) 31 34 32 - 2st version of getNextOptimalShot
+
+    private Coordinate getNextOptimalShot() {
+        if (lastOptimalShot == null){
+            Random random = new Random();
+            lastOptimalShot = new Coordinate(random.nextInt(offset), 0);
+            firstInColumnOptimalShot = new Coordinate(lastOptimalShot.getD(), lastOptimalShot.getL());
+            return lastOptimalShot;
+        }
+        else {
+            lastOptimalShot.setDL(lastOptimalShot.getD()+offset, lastOptimalShot.getL());
+            if (lastOptimalShot.isValid()){
+                return lastOptimalShot;
+            }
+            else{
+                if (firstInColumnOptimalShot.getD() != 0) {
+                    lastOptimalShot.setDL(firstInColumnOptimalShot.getD() - 1, lastOptimalShot.getL() + 1);
+
+                }
+                else{
+                    lastOptimalShot.setDL(firstInColumnOptimalShot.getD() + offset-1, lastOptimalShot.getL() + 1);
+                }
+
+                firstInColumnOptimalShot.setDL(lastOptimalShot.getD(), lastOptimalShot.getL());
+                if (lastOptimalShot.isValid()) {
+                    return lastOptimalShot;
+                }
+            }
+        }
+        return  Coordinate.getRandom();
     }
 }
