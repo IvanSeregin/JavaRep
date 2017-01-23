@@ -4,7 +4,7 @@
 public class Game {
     private static Game instance;
     private Displayable display;
-    private Player player1, player2;
+    private AbstractPlayer player1, player2;
 
 
     private Game(){}
@@ -20,7 +20,7 @@ public class Game {
         this.display = display;
     }
 
-    public void initWithPlayers(Player player1, Player player2){
+    public void initWithPlayers(AbstractPlayer player1, AbstractPlayer player2){
         this.player1 = player1;
         this.player2 = player2;
     }
@@ -55,7 +55,7 @@ public class Game {
         }
     }
 
-    private void nextTurn(Player player){
+    private void nextTurn(AbstractPlayer player){
         display.whoIsNext(player);
 
         while (player.shoot() && !player.isWinner()) {

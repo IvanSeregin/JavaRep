@@ -8,8 +8,10 @@ public class Main {
 
         Displayable display = new ConsoleDisplay();
 
-        Player player1 = new Player();
-        Player player2 = new Player();
+        AbstractPlayer player1 = new PCPlayer();
+        AbstractPlayer player2 = new HumanPlayer();
+
+        ((HumanPlayer) player2).initWithDisplay(display);
 
         display.readPlayers(player1, player2);
         display.greetPlayers(player1, player2);

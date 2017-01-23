@@ -8,7 +8,7 @@ import java.io.InputStreamReader;
 public class ConsoleDisplay implements Displayable {
 
     @Override
-    public void readPlayers(Player player1, Player player2) {
+    public void readPlayers(AbstractPlayer player1, AbstractPlayer player2) {
         try
         {
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -27,7 +27,7 @@ public class ConsoleDisplay implements Displayable {
     }
 
     @Override
-    public void greetPlayers(Player player1, Player player2) {
+    public void greetPlayers(AbstractPlayer player1, AbstractPlayer player2) {
         System.out.println(player1.getName() + ", hi there!");
         System.out.println("Hey " + player2.getName() + " g'luck!");
     }
@@ -62,14 +62,11 @@ public class ConsoleDisplay implements Displayable {
 
     @Override
     public void showBoardInDebugMode(Board board) {
-        System.out.println("    A  B  C  D  E  F  G  H  I  J");
+        System.out.println("   0  1  2  3  4  5  6  7  8  9");
 
         for (int i=0; i<Consts.BOARD_WIDTH; i++){
             //Let's make it look beautiful :)
-            if (i+1 < 10)
-                System.out.print(" " + (i+1) + "  ");
-            else
-                System.out.print(i+1 + "  ");
+            System.out.print(i + "  ");
 
             //Show every singe point in board
             for (int j = 0; j<Consts.BOARD_HEIGHT; j++){
@@ -88,12 +85,12 @@ public class ConsoleDisplay implements Displayable {
     }
 
     @Override
-    public  void whoIsNext(Player player){
-        System.out.println("Now it's " + player.getName() + "'s turn");
+    public  void whoIsNext(AbstractPlayer player){
+        System.out.println("\nNow it's " + player.getName() + "'s turn");
     }
 
     @Override
-    public  void showWinner(Player player){
+    public  void showWinner(AbstractPlayer player){
         System.out.println("Congrats " + player.getName() + ". You won!");
     }
 
@@ -101,4 +98,13 @@ public class ConsoleDisplay implements Displayable {
     public void debugMessage(String message) {
         System.out.println(message);
     }
+
+    @Override
+    public Coordinate askForShot() {
+        System.out.println("Write coordinates: ");
+        Coordinate coordinate = Coordinate.getRandom();
+        return coordinate;
+    }
+
+
 }
