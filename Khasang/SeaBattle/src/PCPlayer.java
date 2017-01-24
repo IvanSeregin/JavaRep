@@ -16,12 +16,18 @@ public class PCPlayer extends AbstractPlayer{
     private boolean is4DeckAlive = true;
     Integer offset = 4;
 
+    //Helper class holds a damaged ship
     private class CurrentShip{
-        public Ship ship;
-        public ShipPosition shipPosition;
-        public Integer damagedPoints;
-        public Point lastDamagedPoint;
+        public Ship ship; //current damaged ship
+        public ShipPosition shipPosition; // position of the ship (is know after 2 damaged points)
+        public Integer damagedPoints; // number of damaged points
+        public Point lastDamagedPoint; // last damaged point :)
+        /* first damaged point in a column, when we start to shot in a new column
+        it should be updated
+        */
         public Point firstDamagedPoint;
+        /*temporary ship position, it's used when only one point of the ship was damaged
+        and position is not known yet*/
         public ShipPosition tmpShipPosition;
 
         CurrentShip(){
@@ -184,7 +190,7 @@ public class PCPlayer extends AbstractPlayer{
             near the last damaged point and determine the position of the ship
             (vertical or horizontal)
             */
-            /*TODO: change this behaviour.
+            /*
              0. Check whether the position (vertical or horizontal) of the ship is known or not.
              If the position is not known
              1. Find an empty point near the last damaged point
@@ -196,7 +202,6 @@ public class PCPlayer extends AbstractPlayer{
               */
             do {
                 if (currentShip.shipPosition == ShipPosition.VERTICAL) {
-                    //coordinate = Coordinate.getRandom();
                     coordinate = currentShip.findNextVerticalPoint();
                 }
                 else if (currentShip.shipPosition == ShipPosition.HORIZONTAL) {
@@ -258,9 +263,10 @@ public class PCPlayer extends AbstractPlayer{
         }
         return false;
     }
-    //35 31 39 28 37 31 16 - without optimal shooting
+    //A piece os statistics...
+    //35 31 39 28 37 31 16 36 45 (298)- without optimal shooting
     //27 34 26 26 28 41 34 40 36 (292)- 1st version of getNextOptimalShot
-    //31 34 26 30 29 40 28 37 31 (286) 31 34 32 - 2st version of getNextOptimalShot
+    //31 34 26 30 29 40 28 37 31 (286) 31 34 32 39 - 2st version of getNextOptimalShot
 
     private Coordinate getNextOptimalShot() {
         if (lastOptimalShot == null){

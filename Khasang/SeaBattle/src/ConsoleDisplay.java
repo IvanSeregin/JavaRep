@@ -101,7 +101,7 @@ public class ConsoleDisplay implements Displayable {
 
     @Override
     public Coordinate askForShot() {
-        System.out.println("Write coordinates: ");
+        System.out.println("Human inputs coordinates (Random coordinates are generated...): ");
         Coordinate coordinate = Coordinate.getRandom();
         return coordinate;
     }

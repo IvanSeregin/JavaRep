@@ -1,15 +1,15 @@
 import java.util.Random;
 
 /**
- * Created by ik34-admin on 09.01.2017.
+ * Created by NortT on 24.01.2017.
+ * This class generates a ship with a random head with a random position (vertical or horizontal)
  */
-public class ShipFactory {
+public class StupidShipFactory extends AbstractShipFactory {
+    @Override
     public Ship createShip(int size) {
         Random random = new Random();
         Coordinate coordinate = Coordinate.getRandom();
         Ship ship = new Ship(size, coordinate, random.nextBoolean());
-        //Coordinate c = new Coordinate(6,0);
-        //Ship ship = new Ship(size, c, true);
         return ship;
     }
 }

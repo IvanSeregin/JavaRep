@@ -36,9 +36,16 @@ public class Board {
      */
     private void placeShip(int count, int size) {
         int n = 0;
-        ShipFactory shipFactory = new ShipFactory();
+        AbstractShipFactory stupidShipFactory = new StupidShipFactory();
+        AbstractShipFactory smartShipFactory = new SmartShipFactory();
         while (n != count){
-            Ship ship = shipFactory.createShip(size);
+            Ship ship;
+            if (size == 1) {
+                ship = stupidShipFactory.createShip(size);
+            }
+            else {
+                ship = smartShipFactory.createShip(size);
+            }
             if (isFit(ship)){
                 fitShip(ship);
                 shipList.add(ship);
@@ -151,8 +158,11 @@ public class Board {
         setHalo(ship);
     }
 
-    //We use the method setHalo() to set halo around specified ship.
-    //Halo helps to avoid two ships together
+    /*
+    We use the method setHalo() to set halo around specified ship.
+    Halo helps to avoid two ships together while the programme generates ships
+    and helps to avoid unnecessary shots around sank ships
+    */
     public void setHalo(Ship ship) {
         Coordinate shipHead = ship.getHead().getCoordinate();
         if (!ship.isVertical()){
