@@ -1,24 +1,16 @@
+import org.omg.CORBA.portable.*;
+
 import java.io.*;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 /**
  * Created by NortT on 02.02.2017.
  */
 public class FileMessageStream extends MessageStream {
-    private Reader reader;
-    private Writer writer;
-
 
     @Override
     public void initConnection() {
-        try (Writer writer = new BufferedWriter(new FileWriter("chat.txt"));
-                Reader reader = new BufferedReader(new FileReader("chat.txt"))) {
-            this.writer = writer;
-            this.reader = reader;
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
 
     }
 
@@ -29,16 +21,19 @@ public class FileMessageStream extends MessageStream {
 
     @Override
     public void sendMessage(Message message) {
-
-    }
-
-    @Override
-    public void closeConnection() {
-        try {
-            writer.close();
-            reader.close();
+        try (ObjectOutputStream out = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream("chat.txt", true)))) {
+            out.writeObject(message);
+            out.reset();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
+
+    @Override
+    public void closeConnection() {
+
+    }
+
 }
