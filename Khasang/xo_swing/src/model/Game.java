@@ -1,9 +1,7 @@
-/**
+package model; /**
  * Created by NortT on 27.12.2016.
  */
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.IOException;
+import view.Displayable;
 
 public class Game
 {
