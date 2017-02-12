@@ -19,6 +19,9 @@ public abstract class Player
         this.name = name;
     }
 
+    public abstract Point turn();
+    public abstract void readPlayerName();
+
     public boolean isWinner()
     {
         return isWinner;
@@ -34,7 +37,7 @@ public abstract class Player
         this.name = name;
     }
 
-    public abstract Point turn();
+
 
     public String getName()
     {

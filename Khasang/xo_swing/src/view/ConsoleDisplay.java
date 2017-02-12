@@ -12,13 +12,13 @@ import java.io.InputStreamReader;
 public class ConsoleDisplay implements Displayable
 {
     @Override
-    public void displayBoard(Game game)
+    public void displayBoard(Board board)
     {
-        for(int i=0; i<game.getBoard().getDimension(); i++)
+        for(int i=0; i<board.getDimension(); i++)
         {
-            for (int j=0; j<game.getBoard().getDimension(); j++)
+            for (int j=0; j<board.getDimension(); j++)
             {
-                System.out.print(game.getBoard().getPoint(i, j).getPointStatus() + " ");
+                System.out.print(board.getPoint(i, j).getPointStatus() + " ");
             }
             System.out.println("");
         }
@@ -26,24 +26,7 @@ public class ConsoleDisplay implements Displayable
     }
 
     @Override
-    public Player readPlayerName(Player player)
-    {
-        try
-        {
-            BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-            System.out.println("Hello, "+ player.getSign() + " player! Write yur name, pls: ");
-            String name = br.readLine();
-            player.setName(name);
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-        return player;
-    }
-
-    @Override
-    public void showWinner(Player player)
+    public void showWinner(String player)
     {
         System.out.println(player + " is the winner");
     }
@@ -55,8 +38,24 @@ public class ConsoleDisplay implements Displayable
     }
 
     @Override
-    public void greetPlayers(Player playerX, Player playerO)
+    public void greetPlayers(String playerX, String playerO)
     {
         System.out.println("Hello, " + playerX + " and " + playerO);
+    }
+
+    @Override
+    public String getPlayerName() {
+        String name = "";
+        System.out.println("Hi, type your name!");
+        try
+        {
+            BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+            name = br.readLine();
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+        return name;
     }
 }

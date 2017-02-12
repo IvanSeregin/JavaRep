@@ -19,4 +19,8 @@ public class CompPlayer extends Player {
         PointFactory pointFactory = new PointFactory();
         return pointFactory.createRandomPoint(sign);
     }
+
+    @Override
+    public void readPlayerName() {
+    }
 }
