@@ -9,8 +9,9 @@ import java.util.Random;
  */
 public class HumanPlayer extends Player {
 
-    private volatile static Point point;
-    private volatile static boolean isShot;
+    private volatile Point point;
+    private volatile boolean isShot;
+    private static GameController controller = GameController.getInstance();
 
     public HumanPlayer(String name, PointStatus sign) {
         super(name, sign);
@@ -20,8 +21,8 @@ public class HumanPlayer extends Player {
         super(name);
     }
 
-    public static void setPoint(Point point) {
-        HumanPlayer.point = point;
+    public void setPoint(Point point) {
+        this.point = point;
     }
 
     @Override
@@ -36,11 +37,11 @@ public class HumanPlayer extends Player {
 
     @Override
     public void readPlayerName() {
-        String name = GameController.getPlayerName();
+        String name = controller.getPlayerName();
         this.setName(name);
     }
 
-    public static void setIsShoot(boolean b) {
+    public void setIsShoot(boolean b) {
         isShot = b;
     }
 }

@@ -6,9 +6,10 @@ import view.Displayable;
 
 import java.util.Random;
 
-public class Game
+public class Game implements Runnable
 {
     static Game instance;
+    private static GameController controller = GameController.getInstance();
 
     private Board board;
     private Player playerX;
@@ -18,7 +19,7 @@ public class Game
 
     public void init(Displayable display)
     {
-        GameController.initWithDisplay(display);
+        controller.initWithDisplay(display);
     }
 
     public static Game getInstance()
@@ -33,18 +34,18 @@ public class Game
     public void initWithBoard(Board board)
     {
         this.board = board;
-        GameController.displayBoard(board);
+        controller.displayBoard(board);
     }
 
     public void showWinner()
     {
         if(playerO.isWinner())
         {
-            GameController.showWinner(playerO);
+            controller.showWinner(playerO);
         } else if(playerX.isWinner()) {
-            GameController.showWinner(playerX);
+            controller.showWinner(playerX);
         } else
-            GameController.showWinner();
+            controller.showWinner();
     }
 
     public void start()
@@ -53,24 +54,27 @@ public class Game
         {
             //It's X'x turn
             //X is trying to set the point to a free square on the board
+            controller.displayBoard(board);
             while (!board.setPoint(playerX.turn()) && !board.isFull());
             {
                 if (board.isTheEnd())
                 {
                     playerX.setWinner(true);
-                    GameController.displayBoard(board);
+                    controller.displayBoard(board);
+                    this.showWinner();
                     return;
                 }
             }
 
-            GameController.displayBoard(board);
+            controller.displayBoard(board);
             //It's O's turn
             while (!board.setPoint(playerO.turn()) && !board.isFull());
             {
                 if (board.isTheEnd())
                 {
                     playerO.setWinner(true);
-                    GameController.displayBoard(board);
+                    controller.displayBoard(board);
+                    this.showWinner();
                     return;
                 }
             }
@@ -83,6 +87,11 @@ public class Game
         playerO.readPlayerName();
         this.playerO = playerO;
         this.playerX = playerX;
-        GameController.greetPlayers(playerX, playerO);
+        controller.greetPlayers(playerX, playerO);
+    }
+
+    @Override
+    public void run() {
+        this.start();
     }
 }

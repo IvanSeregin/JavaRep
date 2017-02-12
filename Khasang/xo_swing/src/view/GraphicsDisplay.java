@@ -6,10 +6,6 @@ import model.Point;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
 
 import static java.lang.System.exit;
 
@@ -20,6 +16,7 @@ public class GraphicsDisplay extends JFrame implements Displayable {
 
     public static final int SIZE = 3;
     JButton array[][] = new JButton[SIZE][SIZE];
+    GameController controller = GameController.getInstance();
 
     public GraphicsDisplay() {
         setSize(200, 200);
@@ -34,7 +31,7 @@ public class GraphicsDisplay extends JFrame implements Displayable {
                 array[i][j] = new JButton(PointStatus.EMPTY.toString());
                 int finalI = i;
                 int finalJ = j;
-                array[i][j].addActionListener(e -> GameController.doShoot(new Point(finalI, finalJ)));
+                array[i][j].addActionListener(e -> controller.doShoot(new Point(finalI, finalJ)));
                 jPanel.add(array[i][j]);
             }
         }
@@ -48,7 +45,7 @@ public class GraphicsDisplay extends JFrame implements Displayable {
         JMenu menu = new JMenu("File");
 
         JMenuItem newGameMenu = new JMenuItem("New game");
-        newGameMenu.addActionListener(e-> GameController.newGame());
+        newGameMenu.addActionListener(e-> controller.newGame());
 
         JMenuItem exitMenu = new JMenuItem("Exit");
         exitMenu.addActionListener(e -> exit(0));

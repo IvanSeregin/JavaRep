@@ -7,38 +7,49 @@ import view.Displayable;
  * Created by ik34-admin on 07.02.2017.
  */
 public class GameController {
-    private static Displayable display;
+    private Displayable display;
+    private static GameController instance;
 
-    public static void doShoot(Point point) {
+    private GameController () {}
+
+    public static GameController getInstance() {
+        return instance;
+    }
+
+    public static void setInstance(GameController instance1) {
+        instance = instance1;
+    }
+
+    public void doShoot(Point point) {
         HumanPlayer.setPoint(point);
         HumanPlayer.setIsShoot(true);
     }
 
-    public static String getPlayerName() {
+    public String getPlayerName() {
         return display.getPlayerName();
     }
 
-    public static void initWithDisplay(Displayable d) {
+    public void initWithDisplay(Displayable d) {
         display = d;
     }
 
-    public static void greetPlayers (Player playerX, Player playerO) {
+    public void greetPlayers (Player playerX, Player playerO) {
         display.greetPlayers(playerX.getName(), playerO.getName());
     }
 
-    public static void showWinner (Player player) {
+    public void showWinner (Player player) {
         display.showWinner(player.getName());
     }
 
-    public static void showWinner() {
+    public void showWinner() {
         display.showWinner();
     }
 
-    public static void displayBoard(Board board) {
+    public void displayBoard(Board board) {
         display.displayBoard(board);
     }
 
-    public static void newGame() {
+    public void newGame() {
         Main.newGame();
     }
 }

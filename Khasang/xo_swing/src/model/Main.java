@@ -23,14 +23,13 @@ public class Main
 
     //эта функция повешена на пункт меню Новая игра в слушателе в GraphicsDisplay (48 строчка)
     public static void newGame() {
-        Player playerX = new CompPlayer("James Bond", PointStatus.X);
+        Player playerX = new HumanPlayer("James Bond", PointStatus.X);
         //Player playerO = new CompPlayer("Looser", PointStatus.O);
         Player playerO = new HumanPlayer("Looser", PointStatus.O);
 
         game.initWithBoard(new Board());
         game.initWithPlayers(playerX, playerO);
 
-        game.start();
-        game.showWinner();
+        new Thread(game).start();
     }
 }
