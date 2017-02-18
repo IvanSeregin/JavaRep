@@ -11,6 +11,8 @@ import java.io.InputStreamReader;
  */
 public class ConsoleDisplay implements Displayable
 {
+    private static ConsoleDisplay instance;
+
     @Override
     public void displayBoard(Board board)
     {
@@ -57,5 +59,16 @@ public class ConsoleDisplay implements Displayable
             e.printStackTrace();
         }
         return name;
+    }
+
+    @Override
+    public void getPlayerType() {
+
+    }
+
+    public static ConsoleDisplay getInstance() {
+        if (instance == null)
+            instance = new ConsoleDisplay();
+        return instance;
     }
 }

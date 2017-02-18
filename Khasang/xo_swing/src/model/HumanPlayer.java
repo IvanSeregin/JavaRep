@@ -10,7 +10,7 @@ import java.util.Random;
 public class HumanPlayer extends Player {
 
     private volatile Point point;
-    private volatile boolean isShot;
+    //private volatile boolean isShot;
     private static GameController controller = GameController.getInstance();
 
     public HumanPlayer(String name, PointStatus sign) {
@@ -21,17 +21,29 @@ public class HumanPlayer extends Player {
         super(name);
     }
 
-    public void setPoint(Point point) {
-        this.point = point;
-    }
+//    public void setPoint(Point point) {
+//        this.point = point;
+//    }
 
     @Override
     public Point turn() {
         //Тут программа зацикливается при запуске через пункт Новая игра, ожидая хода игрока
         //но игрок сходить не может, т.к. ГУИ висит
-        isShot = false;
-        while (!isShot);
+        //isShot = false;
+//        while (!controller.isShoot());
+
+        synchronized (GameController.key) {
+
+            try {
+                GameController.key.wait();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        point = controller.getPoint();
         point.setPointStatus(this.getSign());
+        controller.setShoot(false);
         return point;
     }
 
@@ -39,9 +51,5 @@ public class HumanPlayer extends Player {
     public void readPlayerName() {
         String name = controller.getPlayerName();
         this.setName(name);
-    }
-
-    public void setIsShoot(boolean b) {
-        isShot = b;
     }
 }

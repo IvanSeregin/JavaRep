@@ -12,13 +12,14 @@ import static java.lang.System.exit;
 /**
  * Created by ik34-admin on 06.02.2017.
  */
-public class GraphicsDisplay extends JFrame implements Displayable {
+public class GraphicsDisplay extends JFrame implements Displayable, Runnable {
 
     public static final int SIZE = 3;
-    JButton array[][] = new JButton[SIZE][SIZE];
-    GameController controller = GameController.getInstance();
+    private JButton array[][] = new JButton[SIZE][SIZE];
+    private GameController gameController = GameController.getInstance();
+    private static GraphicsDisplay instance;
 
-    public GraphicsDisplay() {
+    private GraphicsDisplay() {
         setSize(200, 200);
         setTitle("XO Game");
         setLocationRelativeTo(null);
@@ -31,7 +32,7 @@ public class GraphicsDisplay extends JFrame implements Displayable {
                 array[i][j] = new JButton(PointStatus.EMPTY.toString());
                 int finalI = i;
                 int finalJ = j;
-                array[i][j].addActionListener(e -> controller.doShoot(new Point(finalI, finalJ)));
+                array[i][j].addActionListener(e -> gameController.doShoot(new Point(finalI, finalJ)));
                 jPanel.add(array[i][j]);
             }
         }
@@ -40,12 +41,19 @@ public class GraphicsDisplay extends JFrame implements Displayable {
         setVisible(true);
     }
 
+    public static GraphicsDisplay getInstance() {
+        if (instance == null)
+            instance = new GraphicsDisplay();
+        return instance;
+    }
+
     private void crateMenu() {
         JMenuBar menuBar = new JMenuBar();
         JMenu menu = new JMenu("File");
 
         JMenuItem newGameMenu = new JMenuItem("New game");
-        newGameMenu.addActionListener(e-> controller.newGame());
+        newGameMenu.addActionListener(e-> gameController.newGame());
+        //newGameMenu.addActionListener(e-> getPlayerType());
 
         JMenuItem exitMenu = new JMenuItem("Exit");
         exitMenu.addActionListener(e -> exit(0));
@@ -54,7 +62,6 @@ public class GraphicsDisplay extends JFrame implements Displayable {
 
         menu.add(newGameMenu);
         menu.add(exitMenu);
-
 
         setJMenuBar(menuBar);
     }
@@ -77,6 +84,16 @@ public class GraphicsDisplay extends JFrame implements Displayable {
     }
 
     @Override
+    public void getPlayerType() {
+        Object[] possibilities = {GameController.PlayerType.PC, GameController.PlayerType.USER};
+        GameController.PlayerType playerType = (GameController.PlayerType) JOptionPane.showInputDialog(
+                this, "Choose your side", "Hi player #" + gameController.getPlayerCount(),
+                JOptionPane.PLAIN_MESSAGE, null, possibilities, possibilities[0]
+        );
+        gameController.setPlayerType(playerType);
+    }
+
+    @Override
     public void showWinner(String player) {
         JOptionPane.showMessageDialog(this, player + ", you're the winner");
     }
@@ -89,5 +106,11 @@ public class GraphicsDisplay extends JFrame implements Displayable {
     @Override
     public void greetPlayers(String playerX, String playerO) {
         JOptionPane.showMessageDialog(this, "Hello " + playerX + " and " + playerO);
+    }
+
+
+    @Override
+    public void run() {
+
     }
 }

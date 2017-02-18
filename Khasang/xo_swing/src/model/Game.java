@@ -4,23 +4,17 @@ package model; /**
 import controller.GameController;
 import view.Displayable;
 
-import java.util.Random;
-
 public class Game implements Runnable
 {
     static Game instance;
-    private static GameController controller = GameController.getInstance();
+    private static GameController gameController = GameController.getInstance();
 
     private Board board;
     private Player playerX;
     private Player playerO;
+    private volatile int playerCount = 0;
 
     private Game(){} //we use singleton here
-
-    public void init(Displayable display)
-    {
-        controller.initWithDisplay(display);
-    }
 
     public static Game getInstance()
     {
@@ -34,18 +28,18 @@ public class Game implements Runnable
     public void initWithBoard(Board board)
     {
         this.board = board;
-        controller.displayBoard(board);
+        gameController.displayBoard(board);
     }
 
     public void showWinner()
     {
         if(playerO.isWinner())
         {
-            controller.showWinner(playerO);
+            gameController.showWinner(playerO);
         } else if(playerX.isWinner()) {
-            controller.showWinner(playerX);
+            gameController.showWinner(playerX);
         } else
-            controller.showWinner();
+            gameController.showWinner();
     }
 
     public void start()
@@ -54,44 +48,83 @@ public class Game implements Runnable
         {
             //It's X'x turn
             //X is trying to set the point to a free square on the board
-            controller.displayBoard(board);
-            while (!board.setPoint(playerX.turn()) && !board.isFull());
-            {
-                if (board.isTheEnd())
+            gameController.displayBoard(board);
+            if (!board.isFull())
+                while (!board.setPoint(playerX.turn()));
                 {
-                    playerX.setWinner(true);
-                    controller.displayBoard(board);
-                    this.showWinner();
-                    return;
+                    if (board.isTheEnd())
+                    {
+                        playerX.setWinner(true);
+                        gameController.displayBoard(board);
+                        this.showWinner();
+                        return;
+                    }
                 }
-            }
 
-            controller.displayBoard(board);
+            gameController.displayBoard(board);
             //It's O's turn
-            while (!board.setPoint(playerO.turn()) && !board.isFull());
-            {
-                if (board.isTheEnd())
+            if (!board.isFull())
+                while (!board.setPoint(playerO.turn()));
                 {
-                    playerO.setWinner(true);
-                    controller.displayBoard(board);
-                    this.showWinner();
-                    return;
+                    if (board.isTheEnd())
+                    {
+                        playerO.setWinner(true);
+                        gameController.displayBoard(board);
+                        this.showWinner();
+                        return;
+                    }
                 }
-            }
         }
-    }
-
-    public void initWithPlayers(Player playerX, Player playerO)
-    {
-        playerX.readPlayerName();
-        playerO.readPlayerName();
-        this.playerO = playerO;
-        this.playerX = playerX;
-        controller.greetPlayers(playerX, playerO);
+        this.showWinner();
     }
 
     @Override
     public void run() {
+        playerCount = 0;
+        Player playerX = createPlayer(PointStatus.X);
+        this.playerX = playerX;
+
+        Player playerO = createPlayer(PointStatus.O);
+        this.playerO = playerO;
+
+        this.initWithBoard(new Board());
+
+        gameController.greetPlayers(playerX, playerO);
+
         this.start();
+    }
+
+    private Player createPlayer(PointStatus pointStatus) {
+        Player player = null;
+        playerCount ++;
+        //System.out.println(gameController.getGameThread().getName());
+        //while (gameController.determinePlayerType().equals(GameController.PlayerType.EMPTY)) ;
+
+        System.out.println("Sleep");
+        synchronized (GameController.key) {
+            try {
+                GameController.key.wait();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        System.out.println("Awake");
+        switch (gameController.getPlayerType()) {
+            case PC:
+                player = new CompPlayer("Looser", pointStatus);
+                break;
+            case USER:
+                player = new HumanPlayer("Looser", pointStatus);
+                break;
+        }
+        player.readPlayerName();
+
+        //gameController.setPlayerType(GameController.PlayerType.EMPTY);
+
+        return player;
+    }
+
+    public int getPlayerCount() {
+        return playerCount;
     }
 }
