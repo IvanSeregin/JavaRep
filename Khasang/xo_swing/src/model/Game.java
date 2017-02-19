@@ -2,10 +2,20 @@ package model; /**
  * Created by NortT on 27.12.2016.
  */
 import controller.GameController;
-import view.Displayable;
 
 public class Game implements Runnable
 {
+    private class UnknownUserTypeException extends Exception {
+        private String message;
+        public UnknownUserTypeException(String message) {
+            this.message = message;
+        }
+        @Override
+        public String toString() {
+            return "UnknownUserTypeException: " + message;
+        }
+    }
+
     static Game instance;
     private static GameController gameController = GameController.getInstance();
 
@@ -81,10 +91,18 @@ public class Game implements Runnable
     @Override
     public void run() {
         playerCount = 0;
-        Player playerX = createPlayer(PointStatus.X);
+        Player playerX;
+        Player playerO;
+        //I just played around with exceptions here
+        try {
+            playerX = createPlayer(PointStatus.X);
+            playerO = createPlayer(PointStatus.O);
+        } catch (UnknownUserTypeException unknownUserType) {
+            unknownUserType.printStackTrace();
+            gameController.newGame();
+            return;
+        }
         this.playerX = playerX;
-
-        Player playerO = createPlayer(PointStatus.O);
         this.playerO = playerO;
 
         this.initWithBoard(new Board());
@@ -94,21 +112,11 @@ public class Game implements Runnable
         this.start();
     }
 
-    private Player createPlayer(PointStatus pointStatus) {
-        Player player = null;
-        playerCount ++;
-        //System.out.println(gameController.getGameThread().getName());
-        //while (gameController.determinePlayerType().equals(GameController.PlayerType.EMPTY)) ;
+    private Player createPlayer(PointStatus pointStatus) throws UnknownUserTypeException {
+        Player player;
 
-        System.out.println("Sleep");
-        synchronized (GameController.key) {
-            try {
-                GameController.key.wait();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-        System.out.println("Awake");
+        while (gameController.determinePlayerType().equals(GameController.PlayerType.EMPTY));
+
         switch (gameController.getPlayerType()) {
             case PC:
                 player = new CompPlayer("Looser", pointStatus);
@@ -116,15 +124,19 @@ public class Game implements Runnable
             case USER:
                 player = new HumanPlayer("Looser", pointStatus);
                 break;
+            default:
+                throw new UnknownUserTypeException("Probably, you've chosen a user type that has not been developed yet.");
         }
         player.readPlayerName();
 
-        //gameController.setPlayerType(GameController.PlayerType.EMPTY);
-
+        gameController.setPlayerType(GameController.PlayerType.EMPTY);
+        playerCount ++;
         return player;
     }
 
     public int getPlayerCount() {
         return playerCount;
     }
+
+
 }

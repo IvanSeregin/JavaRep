@@ -10,30 +10,15 @@ import java.util.Random;
 public class HumanPlayer extends Player {
 
     private volatile Point point;
-    //private volatile boolean isShot;
     private static GameController controller = GameController.getInstance();
 
     public HumanPlayer(String name, PointStatus sign) {
         super(name, sign);
     }
 
-    public HumanPlayer(String name) {
-        super(name);
-    }
-
-//    public void setPoint(Point point) {
-//        this.point = point;
-//    }
-
     @Override
     public Point turn() {
-        //Тут программа зацикливается при запуске через пункт Новая игра, ожидая хода игрока
-        //но игрок сходить не может, т.к. ГУИ висит
-        //isShot = false;
-//        while (!controller.isShoot());
-
         synchronized (GameController.key) {
-
             try {
                 GameController.key.wait();
             } catch (InterruptedException e) {

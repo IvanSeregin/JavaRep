@@ -7,7 +7,6 @@ import controller.GameController;
  */
 public class Main
 {
-    //private static Game game;
     private static GameController gameController = GameController.getInstance();
     public static void main(String[] args)
     {
@@ -15,7 +14,17 @@ public class Main
         newGame();
     }
 
-    //эта функция повешена на пункт меню Новая игра в слушателе в GraphicsDisplay (48 строчка)
+    /**
+     * What's JavaDoc? :)
+     * This static method is called every time a user wants to run a new game.
+     * Each new game has own thread
+     * What happened with threads already running???
+     * Are they alive???
+     * Should I stop the old threads or not???
+     *
+     * @see Thread
+     * @see GameController
+     */
     public static void newGame() {
         new Thread(gameController).start();
     }

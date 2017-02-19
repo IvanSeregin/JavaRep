@@ -37,8 +37,6 @@ public abstract class Player
         this.name = name;
     }
 
-
-
     public String getName()
     {
         return name;
@@ -52,11 +50,6 @@ public abstract class Player
     public PointStatus getSign()
     {
         return sign;
-    }
-
-    public void setSign(PointStatus sign)
-    {
-        this.sign = sign;
     }
 
     @Override

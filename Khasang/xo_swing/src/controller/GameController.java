@@ -13,7 +13,7 @@ public class GameController implements Runnable{
 
 
     public enum PlayerType {
-        USER("User"), PC("Computer"), EMPTY("Empty");
+        USER("User"), PC("Computer"), NETWORK ("Network"), EMPTY("Empty");
 
         PlayerType(String empty) {
 
@@ -22,11 +22,8 @@ public class GameController implements Runnable{
 
     private Displayable display; //view
     private Game gameInstance; //model
-    private Thread gameThread;
-    private Thread displayThread;
     private static GameController instance; //controller
 
-    private volatile boolean isShoot;
     private volatile Point point;
     private volatile PlayerType playerType=PlayerType.EMPTY;
 
@@ -51,7 +48,6 @@ public class GameController implements Runnable{
         synchronized (key) {
             key.notifyAll();
         }
-//        setShoot(true);
     }
 
     public String getPlayerName() {
@@ -78,15 +74,10 @@ public class GameController implements Runnable{
         Main.newGame();
     }
 
-    public boolean isShoot() {
-        return isShoot;
-    }
-
     public void setShoot(boolean shot) {
         synchronized (key) {
             key.notifyAll();
         }
-        //isShoot = shot;
     }
 
     public Point getPoint() {
@@ -102,13 +93,11 @@ public class GameController implements Runnable{
         synchronized (key) {
             key.notifyAll();
         }
-        //System.out.println("Hey awake!");
     }
 
-    public void determinePlayerType() {
+    public PlayerType determinePlayerType() {
         display.getPlayerType();
-
-        //return playerType;
+        return playerType;
     }
 
     public PlayerType getPlayerType() {
@@ -121,14 +110,7 @@ public class GameController implements Runnable{
 
     @Override
     public void run() {
-        gameThread = new Thread(gameInstance);
-        gameThread.setName("gameThread");
-        gameThread.start();
-        display.getPlayerType();
-        display.getPlayerType();
+        gameInstance.run();
     }
 
-    public Thread getGameThread() {
-        return gameThread;
-    }
 }

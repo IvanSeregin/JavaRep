@@ -20,7 +20,7 @@ public class GraphicsDisplay extends JFrame implements Displayable, Runnable {
     private static GraphicsDisplay instance;
 
     private GraphicsDisplay() {
-        setSize(200, 200);
+        setSize(250, 250);
         setTitle("XO Game");
         setLocationRelativeTo(null);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -53,7 +53,6 @@ public class GraphicsDisplay extends JFrame implements Displayable, Runnable {
 
         JMenuItem newGameMenu = new JMenuItem("New game");
         newGameMenu.addActionListener(e-> gameController.newGame());
-        //newGameMenu.addActionListener(e-> getPlayerType());
 
         JMenuItem exitMenu = new JMenuItem("Exit");
         exitMenu.addActionListener(e -> exit(0));
@@ -85,12 +84,18 @@ public class GraphicsDisplay extends JFrame implements Displayable, Runnable {
 
     @Override
     public void getPlayerType() {
-        Object[] possibilities = {GameController.PlayerType.PC, GameController.PlayerType.USER};
+        Object[] possibilities = {GameController.PlayerType.PC, GameController.PlayerType.USER, GameController.PlayerType.NETWORK};
         GameController.PlayerType playerType = (GameController.PlayerType) JOptionPane.showInputDialog(
                 this, "Choose your side", "Hi player #" + gameController.getPlayerCount(),
                 JOptionPane.PLAIN_MESSAGE, null, possibilities, possibilities[0]
         );
-        gameController.setPlayerType(playerType);
+        if (playerType != null){
+            gameController.setPlayerType(playerType);
+        } else {
+            gameController.setPlayerType(GameController.PlayerType.EMPTY);
+        }
+
+
     }
 
     @Override
