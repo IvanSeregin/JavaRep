@@ -1,24 +1,21 @@
 package View;
 
 import Controller.ContactListController;
+import Controller.SendMessageController;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.*;
 
 /**
  * Created by ik34-admin on 13.02.2017.
  */
-public class MainWindow extends JFrame {
+public class MainWindow extends JFrame implements  Runnable{
     ContactListController contactListController = new ContactListController();
+    SendMessageController sendMessageController = new SendMessageController();
 
     public MainWindow () {
-        setSize(400, 400);
-        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        setExtendedState(getExtendedState() | MAXIMIZED_BOTH);
-        setLayout(new BorderLayout());
-        createMenu();
-        createInterface();
-        setVisible(true);
+
     }
 
     private void createInterface() {
@@ -43,14 +40,35 @@ public class MainWindow extends JFrame {
         contactList.setModel(contactListController.getUserListMode());
 
         //Create a message box and a message area
-        JTextField messageBox = new JTextField("Type your message here");
+        JTextField messageBox = new JTextField();
         JButton buttonSend = new JButton("Send");
         messageSendPanel.add(messageBox);
         messageSendPanel.add(buttonSend, BorderLayout.EAST);
+        buttonSend.addActionListener(e -> {
+            sendMessageController.send(messageBox.getText());
+            messageBox.grabFocus();
+            messageBox.setText("");
+        });
+
+
+
+        messageBox.addActionListener(e -> {
+            sendMessageController.send(messageBox.getText());
+            messageBox.grabFocus();
+            messageBox.setText("");
+        });
 
         JTextArea messageArea = new JTextArea();
         JScrollPane messageScroller = new JScrollPane(messageArea);
         messagePanel.add(messageScroller, BorderLayout.CENTER);
+
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosed(WindowEvent e) {
+                super.windowClosed(e);
+                sendMessageController.close();
+            }
+        });
     }
 
     private void createMenu() {
@@ -72,5 +90,16 @@ public class MainWindow extends JFrame {
         menuBar.add(helpMenu);
 
         setJMenuBar(menuBar);
+    }
+
+    @Override
+    public void run() {
+        setSize(400, 400);
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        setExtendedState(getExtendedState() | MAXIMIZED_BOTH);
+        setLayout(new BorderLayout());
+        createMenu();
+        createInterface();
+        setVisible(true);
     }
 }
