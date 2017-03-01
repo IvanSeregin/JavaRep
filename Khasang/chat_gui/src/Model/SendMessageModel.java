@@ -13,15 +13,14 @@ import java.net.Socket;
 public class SendMessageModel {
     private DataOutputStream dos;
     private Socket socket = null;
-    private final String host = "localhost";
-    private final String port = "8020";
+
 
     public SendMessageModel() {
         try {
-            socket = new Socket(host, Integer.parseInt(port));
-            dos = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
+            socket = ChatSocket.getSocket();
+            dos = new DataOutputStream((socket.getOutputStream()));
         } catch (IOException e) {
-            System.out.println("Cannot connect to the server.");
+            System.out.println("Cannot get output stream");
             e.printStackTrace();
         }
     }
@@ -30,7 +29,7 @@ public class SendMessageModel {
         if (!text.equals(""))
             try {
                 dos.writeUTF(text);
-                dos.flush();
+                //dos.flush();
             } catch (IOException e) {
                 e.printStackTrace();
             }

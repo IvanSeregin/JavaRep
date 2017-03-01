@@ -14,19 +14,18 @@ public class ReceiveMessageModel implements Runnable {
     private ReceiveMessageController receiveMessageController;
     private DataInputStream dis;
     private Socket socket;
-    private final String host = "localhost";
-    private final String port = "8020";
-
 
     @Override
     public void run() {
         receiveMessageController = new ReceiveMessageController(this);
         try {
+            socket = ChatSocket.getSocket();
+            dis = new DataInputStream((socket.getInputStream()));
+
             while (true) {
-                socket = new Socket(host, Integer.parseInt(port));
-                dis = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
+                System.out.println("Listening to the server...");
                 String message = dis.readUTF();
-                receiveMessageController.newMessage(message);
+                receiveMessageController.newMessageReceived(message);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -47,6 +46,5 @@ public class ReceiveMessageModel implements Runnable {
                 }
             }
         }
-
     }
 }

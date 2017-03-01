@@ -1,5 +1,7 @@
 package Model;
 
+import Controller.ReceiveMessageController;
+import Observer.Observable;
 import View.MainWindow;
 
 import java.io.IOException;
@@ -9,7 +11,9 @@ import java.io.IOException;
  */
 public class Main {
     public static void main(String[] args) throws IOException {
-        new Thread(new MainWindow()).start();
-        new Thread(new ReceiveMessageModel()).start();
+        ReceiveMessageModel messageModel = new ReceiveMessageModel();
+        ReceiveMessageController messageController = new ReceiveMessageController(messageModel);
+        new Thread(new MainWindow(messageController)).start();
+        new Thread(messageModel).start();
     }
 }

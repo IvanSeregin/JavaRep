@@ -2,20 +2,26 @@ package View;
 
 import Controller.ContactListController;
 import Controller.SendMessageController;
+import Message.Message;
+import Observer.*;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
+
 /**
  * Created by ik34-admin on 13.02.2017.
  */
-public class MainWindow extends JFrame implements  Runnable{
+public class MainWindow extends JFrame implements  Runnable, Observer{
     ContactListController contactListController = new ContactListController();
     SendMessageController sendMessageController = new SendMessageController();
+    private Observable observable;
+    private JTextArea messageArea;
 
-    public MainWindow () {
-
+    public MainWindow (Observable observable) {
+        this.observable = observable;
+        observable.addObserver(this);
     }
 
     private void createInterface() {
@@ -50,15 +56,13 @@ public class MainWindow extends JFrame implements  Runnable{
             messageBox.setText("");
         });
 
-
-
         messageBox.addActionListener(e -> {
             sendMessageController.send(messageBox.getText());
             messageBox.grabFocus();
             messageBox.setText("");
         });
 
-        JTextArea messageArea = new JTextArea();
+        messageArea = new JTextArea();
         JScrollPane messageScroller = new JScrollPane(messageArea);
         messagePanel.add(messageScroller, BorderLayout.CENTER);
 
@@ -96,10 +100,16 @@ public class MainWindow extends JFrame implements  Runnable{
     public void run() {
         setSize(400, 400);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        setExtendedState(getExtendedState() | MAXIMIZED_BOTH);
+        //setExtendedState(getExtendedState() | MAXIMIZED_BOTH);
         setLayout(new BorderLayout());
         createMenu();
         createInterface();
         setVisible(true);
+    }
+
+    @Override
+    public void update() {
+        String message = observable.getState();
+        messageArea.append(message);
     }
 }
