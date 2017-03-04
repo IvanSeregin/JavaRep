@@ -1,6 +1,6 @@
 package Observer;
 
-import Message.Message;
+import Helpers.Message;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,5 +14,5 @@ public interface Observable {
     void removeObserver(Observer observer);
     void notifyObservers();
 
-    String getState();
+    Message getState();
 }

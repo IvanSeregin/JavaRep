@@ -1,5 +1,6 @@
 package Controller;
 
+import Helpers.Message;
 import Model.SendMessageModel;
 
 /**
@@ -12,8 +13,8 @@ public class SendMessageController {
         sendMessageModel = new SendMessageModel();
     }
 
-    public void send(String text) {
-        sendMessageModel.send(text);
+    public void send(Message message) {
+        sendMessageModel.send(message);
     }
 
     public void close() {

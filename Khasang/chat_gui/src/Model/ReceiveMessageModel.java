@@ -1,10 +1,12 @@
 package Model;
 
 import Controller.ReceiveMessageController;
+import Helpers.Message;
 
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.net.Socket;
 
 /**
@@ -12,22 +14,28 @@ import java.net.Socket;
  */
 public class ReceiveMessageModel implements Runnable {
     private ReceiveMessageController receiveMessageController;
-    private DataInputStream dis;
+    private ObjectInputStream ois;
     private Socket socket;
+
+    public ReceiveMessageModel() {
+        receiveMessageController = new ReceiveMessageController();
+    }
 
     @Override
     public void run() {
-        receiveMessageController = new ReceiveMessageController(this);
+
         try {
             socket = ChatSocket.getSocket();
-            dis = new DataInputStream((socket.getInputStream()));
+            ois = new ObjectInputStream((socket.getInputStream()));
 
             while (true) {
                 System.out.println("Listening to the server...");
-                String message = dis.readUTF();
+                Message message = (Message) ois.readObject();
                 receiveMessageController.newMessageReceived(message);
             }
         } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
             e.printStackTrace();
         } finally {
             if (socket != null) {
@@ -38,13 +46,17 @@ public class ReceiveMessageModel implements Runnable {
                 }
             }
 
-            if (dis != null) {
+            if (ois != null) {
                 try {
-                    dis.close();
+                    ois.close();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
         }
+    }
+
+    public ReceiveMessageController getController() {
+        return receiveMessageController;
     }
 }

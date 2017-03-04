@@ -2,7 +2,8 @@ package View;
 
 import Controller.ContactListController;
 import Controller.SendMessageController;
-import Message.Message;
+import Helpers.Message;
+import Helpers.User;
 import Observer.*;
 
 import javax.swing.*;
@@ -18,6 +19,8 @@ public class MainWindow extends JFrame implements  Runnable, Observer{
     SendMessageController sendMessageController = new SendMessageController();
     private Observable observable;
     private JTextArea messageArea;
+    private User user = new User();
+    private volatile Message message;
 
     public MainWindow (Observable observable) {
         this.observable = observable;
@@ -51,13 +54,15 @@ public class MainWindow extends JFrame implements  Runnable, Observer{
         messageSendPanel.add(messageBox);
         messageSendPanel.add(buttonSend, BorderLayout.EAST);
         buttonSend.addActionListener(e -> {
-            sendMessageController.send(messageBox.getText());
+            message.setMessage(messageBox.getText());
+            sendMessageController.send(message);
             messageBox.grabFocus();
             messageBox.setText("");
         });
 
         messageBox.addActionListener(e -> {
-            sendMessageController.send(messageBox.getText());
+            message.setMessage(messageBox.getText());
+            sendMessageController.send(message);
             messageBox.grabFocus();
             messageBox.setText("");
         });
@@ -105,11 +110,27 @@ public class MainWindow extends JFrame implements  Runnable, Observer{
         createMenu();
         createInterface();
         setVisible(true);
+        message = new Message(newUser());
     }
+
+    private User newUser() {
+        String nickname = (String) JOptionPane.showInputDialog(
+                this,
+                "Type your nickname",
+                "Nickname",
+                JOptionPane.PLAIN_MESSAGE,
+                null,
+                null,
+                "");
+        user.setNickname(nickname);
+        return user;
+    }
+
 
     @Override
     public void update() {
-        String message = observable.getState();
-        messageArea.append(message);
+        Message message = observable.getState();
+        messageArea.append(message.getTime() + "\n");
+        messageArea.append(message.getUser().getNickname() + ": " + message.getMessage() + "\n");
     }
 }

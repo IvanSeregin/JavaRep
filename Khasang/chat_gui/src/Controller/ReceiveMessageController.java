@@ -1,8 +1,7 @@
 package Controller;
 
-import Message.Message;
+import Helpers.Message;
 import Model.ReceiveMessageModel;
-import View.MainWindow;
 import Observer.*;
 
 /**
@@ -10,15 +9,9 @@ import Observer.*;
  */
 public class ReceiveMessageController implements Observable {
 
-    //private ReceiveMessageModel receiveMessageModel;
-    private volatile String currentMessage;
+    private volatile Message currentMessage;
 
-
-    public ReceiveMessageController(ReceiveMessageModel receiveMessageModel) {
-        //this.receiveMessageModel = receiveMessageModel;
-    }
-
-    public void newMessageReceived(String message) {
+    public void newMessageReceived(Message message) {
         this.currentMessage = message;
         notifyObservers();
     }
@@ -41,8 +34,7 @@ public class ReceiveMessageController implements Observable {
     }
 
     @Override
-    public String getState() {
-        System.out.println(currentMessage);
+    public Message getState() {
         return currentMessage;
     }
 }
